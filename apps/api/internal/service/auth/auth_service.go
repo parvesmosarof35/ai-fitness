@@ -35,6 +35,9 @@ func (s *AuthService) Register(email, password string) (*domain.User, error) {
 	}
 
 	if err := s.db.Create(user).Error; err != nil {
+		if err.Error() == "UNIQUE constraint failed: users.email" || errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, errors.New("email already registered")
+		}
 		return nil, err
 	}
 
@@ -67,7 +70,7 @@ func (s *AuthService) GenerateTokens(user *domain.User) (string, string, *domain
 	}
 
 	// Refresh Token
-	refreshTokenString := uuid.New().String() + "-" + uuid.New().String()
+	refreshTokenString := uuid.New().String()
 	hash, _ := bcrypt.GenerateFromPassword([]byte(refreshTokenString), bcrypt.DefaultCost)
 
 	session := domain.AuthSession{
