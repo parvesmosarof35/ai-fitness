@@ -1,0 +1,79 @@
+import { z } from 'zod';
+
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+export const registerSchema = loginSchema.extend({
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
+});
+
+export const onboardingSchema = z.object({
+  age: z.coerce.number().min(13, 'Must be at least 13').max(120, 'Invalid age'),
+  language: z.enum(['en', 'bn']),
+  unitSystem: z.enum(['metric', 'imperial']),
+  
+  // Height fields
+  heightCm: z.coerce.number().optional(),
+  heightFt: z.coerce.number().optional(),
+  heightIn: z.coerce.number().optional(),
+  
+  // Weight fields
+  weightKg: z.coerce.number().optional(),
+  weightLbs: z.coerce.number().optional(),
+  
+  goals: z.string().min(1, 'Please select a goal'),
+  activityLevel: z.string().min(1, 'Please select an activity level'),
+  dailyTimeMinutes: z.coerce.number().min(5, 'Minimum 5 minutes'),
+  dietaryPreferences: z.string().optional(),
+  healthDisclaimerAccepted: z.literal(true, {
+    message: 'You must accept the health disclaimer'
+  }),
+}).superRefine((data, ctx) => {
+  if (data.unitSystem === 'metric') {
+    if (!data.heightCm || data.heightCm <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Height is required',
+        path: ['heightCm'],
+      });
+    }
+    if (!data.weightKg || data.weightKg <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Weight is required',
+        path: ['weightKg'],
+      });
+    }
+  } else {
+    if (!data.heightFt || data.heightFt <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Feet is required',
+        path: ['heightFt'],
+      });
+    }
+    if (data.heightIn === undefined || data.heightIn < 0 || data.heightIn >= 12) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Inches must be between 0 and 11',
+        path: ['heightIn'],
+      });
+    }
+    if (!data.weightLbs || data.weightLbs <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Weight is required',
+        path: ['weightLbs'],
+      });
+    }
+  }
+});
+
+export type LoginPayload = z.infer<typeof loginSchema>;
+export type RegisterPayload = z.infer<typeof registerSchema>;
+export type OnboardingPayload = z.infer<typeof onboardingSchema>;

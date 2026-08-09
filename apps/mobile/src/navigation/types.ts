@@ -1,0 +1,38 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
+
+export type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+};
+
+export type OnboardingStackParamList = {
+  OnboardingStart: undefined;
+};
+
+export type MainTabParamList = {
+  Home: undefined;
+  Workouts: undefined;
+  Progress: undefined;
+  Profile: undefined;
+};
+
+export type WorkoutStackParamList = {
+  WorkoutList: undefined;
+  WorkoutOverview: { workoutId: string };
+  ActiveSession: undefined;
+  CameraTracker: { exerciseName: string };
+  WorkoutComplete: undefined;
+};
+
+export type RootStackParamList = {
+  Auth: NavigatorScreenParams<AuthStackParamList>;
+  Onboarding: NavigatorScreenParams<OnboardingStackParamList>;
+  Main: NavigatorScreenParams<MainTabParamList>;
+};
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
