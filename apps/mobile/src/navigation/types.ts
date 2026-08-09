@@ -13,6 +13,7 @@ export type OnboardingStackParamList = {
 export type MainTabParamList = {
   Home: undefined;
   Workouts: undefined;
+  Meals: undefined;
   Progress: undefined;
   Profile: undefined;
 };
