@@ -18,7 +18,7 @@ export default function OnboardingStartScreen() {
   const completeOnboarding = useAuthStore((state) => state.completeOnboarding);
   const [step, setStep] = useState(1);
 
-  const { control, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<OnboardingPayload>({
+  const { control, handleSubmit, watch, setValue, trigger, formState: { errors, isSubmitting } } = useForm<OnboardingPayload>({
     resolver: zodResolver(onboardingSchema) as any,
     defaultValues: {
       language: 'en',
@@ -28,6 +28,7 @@ export default function OnboardingStartScreen() {
       activityLevel: 'active',
       dailyTimeMinutes: 30,
     },
+    mode: 'onTouched',
   });
 
   const unitSystem = watch('unitSystem');
@@ -62,7 +63,23 @@ export default function OnboardingStartScreen() {
     }
   };
 
-  const nextStep = () => setStep(s => Math.min(s + 1, TOTAL_STEPS));
+  const nextStep = async () => {
+    let fieldsToValidate: any[] = [];
+    if (step === 1) fieldsToValidate = ['age', 'unitSystem'];
+    if (step === 2) {
+      fieldsToValidate = unitSystem === 'metric' 
+        ? ['heightCm', 'weightKg'] 
+        : ['heightFt', 'heightIn', 'weightLbs'];
+    }
+    if (step === 3) fieldsToValidate = ['goals', 'activityLevel'];
+    if (step === 4) fieldsToValidate = ['healthDisclaimerAccepted'];
+
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) {
+      setStep(s => Math.min(s + 1, TOTAL_STEPS));
+    }
+  };
+
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   return (
@@ -210,11 +227,31 @@ export default function OnboardingStartScreen() {
 
             <View className="bg-zinc-800 p-5 rounded-2xl border border-zinc-700/50 mb-8">
               <Text className="text-emerald-400 font-bold mb-2 uppercase tracking-wider text-xs">Health Disclaimer</Text>
-              <Text className="text-zinc-300 leading-relaxed text-sm">
+              <Text className="text-zinc-300 leading-relaxed text-sm mb-4">
                 This app provides fitness recommendations based on AI models. 
                 It is not a substitute for professional medical advice. 
                 By proceeding, you accept that you are participating at your own risk.
               </Text>
+              
+              <Controller
+                control={control}
+                name="healthDisclaimerAccepted"
+                render={({ field: { value, onChange } }) => (
+                  <TouchableOpacity 
+                    className="flex-row items-center mt-2" 
+                    onPress={() => onChange(!value)}
+                    activeOpacity={0.7}
+                  >
+                    <View className={`w-6 h-6 rounded border items-center justify-center mr-3 ${value ? 'bg-emerald-500 border-emerald-500' : 'border-zinc-500'}`}>
+                      {value && <CheckCircle2 color="#09090b" size={16} />}
+                    </View>
+                    <Text className="text-white flex-1">I accept the health disclaimer</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              {errors.healthDisclaimerAccepted && (
+                <Text className="text-red-500 text-xs mt-2">{errors.healthDisclaimerAccepted.message}</Text>
+              )}
             </View>
           </View>
         )}

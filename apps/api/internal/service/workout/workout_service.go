@@ -93,3 +93,45 @@ func (s *WorkoutService) CompleteSession(userID string, sessionID string, client
 
 	return &session, nil
 }
+
+type ProgressSummary struct {
+	TotalWorkouts int
+	TotalMinutes  int
+	TotalCalories float64
+}
+
+func (s *WorkoutService) GetWorkoutPlans(userID string) ([]domain.WorkoutPlan, error) {
+	uid, _ := uuid.Parse(userID)
+	var plans []domain.WorkoutPlan
+	err := s.db.Where("user_id = ?", uid).Preload("Exercises").Preload("Exercises.Exercise").Order("created_at desc").Find(&plans).Error
+	return plans, err
+}
+
+func (s *WorkoutService) GetSessionHistory(userID string) ([]domain.WorkoutSession, error) {
+	uid, _ := uuid.Parse(userID)
+	var sessions []domain.WorkoutSession
+	err := s.db.Where("user_id = ? AND status = 'completed'", uid).Preload("Logs").Order("end_time desc").Limit(20).Find(&sessions).Error
+	return sessions, err
+}
+
+func (s *WorkoutService) GetProgressSummary(userID string) (*ProgressSummary, error) {
+	uid, _ := uuid.Parse(userID)
+	var sessions []domain.WorkoutSession
+	err := s.db.Where("user_id = ? AND status = 'completed'", uid).Find(&sessions).Error
+	if err != nil {
+		return nil, err
+	}
+
+	summary := &ProgressSummary{}
+	summary.TotalWorkouts = len(sessions)
+	for _, session := range sessions {
+		if session.CaloriesBurned != nil {
+			summary.TotalCalories += *session.CaloriesBurned
+		}
+		if session.EndTime != nil {
+			mins := int(session.EndTime.Sub(session.StartTime).Minutes())
+			summary.TotalMinutes += mins
+		}
+	}
+	return summary, nil
+}

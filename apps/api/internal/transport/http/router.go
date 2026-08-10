@@ -52,16 +52,27 @@ func NewRouter(cfg config.Config, authHandler *handler.AuthHandler, profileHandl
 				workouts.POST("/generate", workoutHandler.GenerateWorkout)
 			}
 
+			workoutPlans := protected.Group("/workout-plans")
+			{
+				workoutPlans.GET("", workoutHandler.ListPlans)
+			}
+
 			sessions := protected.Group("/workout-sessions")
 			{
 				sessions.POST("", workoutHandler.CreateSession)
 				sessions.PUT("/:id/complete", workoutHandler.CompleteSession)
+				sessions.GET("/history", workoutHandler.GetSessionHistory)
 			}
 
 			meals := protected.Group("/meals")
 			{
 				meals.GET("", mealHandler.GetMealLogs)
 				meals.POST("/analyze", mealHandler.AnalyzeMeal)
+			}
+
+			progress := protected.Group("/progress")
+			{
+				progress.GET("/summary", workoutHandler.GetProgressSummary)
 			}
 		}
 	}

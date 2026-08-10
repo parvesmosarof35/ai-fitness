@@ -98,3 +98,33 @@ func (h *WorkoutHandler) GenerateWorkout(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": plan})
 }
+
+func (h *WorkoutHandler) ListPlans(c *gin.Context) {
+	userID := c.GetString("userID")
+	plans, err := h.workoutService.GetWorkoutPlans(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch plans"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": plans})
+}
+
+func (h *WorkoutHandler) GetSessionHistory(c *gin.Context) {
+	userID := c.GetString("userID")
+	sessions, err := h.workoutService.GetSessionHistory(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch history"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": sessions})
+}
+
+func (h *WorkoutHandler) GetProgressSummary(c *gin.Context) {
+	userID := c.GetString("userID")
+	summary, err := h.workoutService.GetProgressSummary(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch progress"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": summary})
+}

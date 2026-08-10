@@ -27,6 +27,7 @@ export type WorkoutStackParamList = {
 };
 
 export type RootStackParamList = {
+  Intro: undefined;
   Auth: NavigatorScreenParams<AuthStackParamList>;
   Onboarding: NavigatorScreenParams<OnboardingStackParamList>;
   Main: NavigatorScreenParams<MainTabParamList>;

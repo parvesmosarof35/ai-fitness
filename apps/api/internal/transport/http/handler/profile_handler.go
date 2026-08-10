@@ -35,13 +35,41 @@ func (h *ProfileHandler) GetMe(c *gin.Context) {
 	})
 }
 
+type ProfileOnboardingRequest struct {
+	Age                        int      `json:"age"`
+	Language                   string   `json:"language"`
+	UnitSystem                 string   `json:"unitSystem"`
+	HeightCm                   float64  `json:"heightCm"`
+	WeightKg                   float64  `json:"weightKg"`
+	PrimaryGoal                string   `json:"primaryGoal"`
+	ActivityLevel              string   `json:"activityLevel"`
+	DailyTimeMinutes           int16    `json:"dailyTimeMinutes"`
+	DietaryPreferences         []string `json:"dietaryPreferences"`
+	HealthDisclaimerAccepted   bool     `json:"healthDisclaimerAccepted"`
+}
+
 func (h *ProfileHandler) UpdateOnboarding(c *gin.Context) {
 	userID := c.GetString("userID")
-	var profile domain.UserProfile
+	var req ProfileOnboardingRequest
 
-	if err := c.ShouldBindJSON(&profile); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Compute an approximate birthdate from age
+	birthDate := time.Now().AddDate(-req.Age, 0, 0)
+	
+	profile := domain.UserProfile{
+		BirthDate:           &birthDate,
+		Language:            &req.Language,
+		UnitSystem:          &req.UnitSystem,
+		HeightCm:            &req.HeightCm,
+		WeightKg:            &req.WeightKg,
+		PrimaryGoal:         &req.PrimaryGoal,
+		ActivityLevel:       &req.ActivityLevel,
+		DailyTimeMinutes:    &req.DailyTimeMinutes,
+		DietaryPreferences:  req.DietaryPreferences,
 	}
 
 	if err := h.profileService.UpsertProfile(userID, &profile); err != nil {

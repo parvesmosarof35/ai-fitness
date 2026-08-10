@@ -20,9 +20,13 @@ export function MainTabNavigator() {
         tabBarStyle: {
           backgroundColor: '#09090b', // zinc-950
           borderTopColor: '#27272a', // zinc-800
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
+          paddingBottom: 10,
+          paddingTop: 5,
+          height: 65,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
         },
         tabBarActiveTintColor: '#34d399', // emerald-400
         tabBarInactiveTintColor: '#71717a', // zinc-500

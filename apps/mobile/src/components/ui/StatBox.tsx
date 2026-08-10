@@ -8,9 +8,10 @@ interface StatBoxProps {
   value: string;
   icon: LucideIcon;
   iconColor?: string;
+  colorClass?: string;
 }
 
-export function StatBox({ label, value, icon: Icon, iconColor = '#34d399' }: StatBoxProps) {
+export function StatBox({ label, value, icon: Icon, iconColor = '#34d399', colorClass }: StatBoxProps) {
   return (
     <Card className="flex-1 flex-col justify-between p-4" style={{ minHeight: 110 }}>
       <View className="flex-row justify-between items-center mb-2">

@@ -38,7 +38,24 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": gin.H{"id": user.ID, "email": user.Email}})
+	accessToken, refreshToken, user, err := h.authService.GenerateTokens(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate tokens"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"data": gin.H{
+			"accessToken":          accessToken,
+			"refreshToken":         refreshToken,
+			"accessTokenExpiresAt": time.Now().Add(15 * time.Minute),
+			"user": gin.H{
+				"id":                     user.ID,
+				"email":                  user.Email,
+				"hasCompletedOnboarding": false,
+			},
+		},
+	})
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {

@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView, StatusBar } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ArrowLeft, Mail } from 'lucide-react-native';
 import { AuthStackParamList } from '../../navigation/types';
 import { Input } from '../../components/forms/Input';
 import { Button } from '../../components/forms/Button';
+import { BrandGradient } from '../../components/ui/BrandGradient';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,51 +35,79 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-      className="flex-1 bg-zinc-900"
+      className="flex-1 bg-background"
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, justifyContent: 'center' }}>
-        
-        <TouchableOpacity onPress={() => navigation.goBack()} className="mb-8">
-          <Text className="text-emerald-400 font-bold">← Back to Login</Text>
-        </TouchableOpacity>
-
-        <Text className="text-4xl font-bold text-white mb-2">Reset Password</Text>
-        
-        {isSent ? (
-          <View className="mt-8">
-            <Text className="text-zinc-300 text-lg mb-8">
-              If an account exists with that email, a password reset link has been sent.
-            </Text>
-            <Button 
-              label="Return to Login" 
-              variant="outline"
-              onPress={() => navigation.navigate('Login')} 
-            />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+        {/* Header */}
+        <SafeAreaView style={{ paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }}>
+          <View className="flex-row justify-between items-center px-6 py-4">
+            <TouchableOpacity 
+              className="w-10 h-10 rounded-full bg-surface-highlight items-center justify-center"
+              onPress={() => navigation.goBack()}
+            >
+              <ArrowLeft color="#a1a1aa" size={20} />
+            </TouchableOpacity>
+            <Text className="text-white font-black text-sm tracking-widest uppercase">FORGE AI</Text>
           </View>
-        ) : (
-          <View>
-            <Text className="text-zinc-400 mb-8">
-              Enter your email address and we will send you instructions to reset your password.
-            </Text>
+        </SafeAreaView>
 
-            <Input
-              name="email"
-              control={control}
-              label="Email"
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+        <View className="px-8 pt-12 pb-12 flex-1 justify-center">
+          {isSent ? (
+            <>
+              <View className="mb-10 items-center">
+                <Text className="text-5xl font-black text-brand-purple leading-tight tracking-tight">CHECK</Text>
+                <Text className="text-5xl font-black text-white tracking-tight">EMAIL</Text>
+                <Text className="text-zinc-400 text-center mt-6 px-4">
+                  We sent a magic link to your inbox. Tap it to get back in the game.
+                </Text>
+              </View>
 
-            <View className="mt-8">
-              <Button 
-                label="Send Reset Link" 
-                onPress={handleSubmit(onSubmit)} 
-                loading={isSubmitting} 
-              />
-            </View>
-          </View>
-        )}
+              <View className="mt-4">
+                <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Login')}>
+                  <BrandGradient className="px-6 py-4 rounded-full flex-row justify-center items-center">
+                    <Mail color="#09090b" size={20} className="mr-3" />
+                    <Text className="text-zinc-950 font-black uppercase tracking-wider text-sm">Open Mail App</Text>
+                  </BrandGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity className="mt-8 self-center" onPress={() => setIsSent(false)}>
+                  <Text className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Resend Email</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <View className="mb-10">
+                <Text className="text-5xl font-black text-brand-cyan leading-tight tracking-tight">RESET</Text>
+                <Text className="text-5xl font-black text-white tracking-tight">PASSWORD</Text>
+                <Text className="text-zinc-400 mt-6">
+                  No sweat! Enter your email and we'll get you back to the grind.
+                </Text>
+              </View>
+
+              <View className="bg-surface-highlight/30 p-6 rounded-[32px] border border-white/5 mb-8">
+                <Input
+                  name="email"
+                  control={control}
+                  label="Email"
+                  placeholder="GymHero@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  iconName="mail"
+                />
+
+                <View className="mt-4">
+                  <Button 
+                    label="Send Reset Link" 
+                    onPress={handleSubmit(onSubmit)} 
+                    loading={isSubmitting} 
+                    variant="primary"
+                  />
+                </View>
+              </View>
+            </>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

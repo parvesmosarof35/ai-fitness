@@ -7,14 +7,19 @@ import { AuthNavigator } from './AuthNavigator';
 import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
 
+import { IntroScreen } from '../screens/intro/IntroScreen';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
-  const { isAuthenticated, hasCompletedOnboarding } = useAuthStore();
+  const { isAuthenticated, hasCompletedOnboarding, hasSeenIntro } = useAuthStore();
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isAuthenticated ? (
+      {!hasSeenIntro ? (
+        // User has never seen the intro splash screens
+        <Stack.Screen name="Intro" component={IntroScreen} />
+      ) : !isAuthenticated ? (
         // User is not signed in
         <Stack.Screen name="Auth" component={AuthNavigator} />
       ) : !hasCompletedOnboarding ? (

@@ -21,8 +21,8 @@ const MenuOption = ({ icon: Icon, title, subtitle, onPress, destructive = false 
 );
 
 export default function ProfileScreen() {
-  const { session, signOut } = useAuthStore();
-  const userName = session?.profile?.language ? "Parves Explorer" : "Fitness Champion";
+  const { user, signOut } = useAuthStore();
+  const userName = user?.email ? user.email.split('@')[0] : "Fitness Champion";
   
   const handleSignOut = () => {
     Alert.alert(
