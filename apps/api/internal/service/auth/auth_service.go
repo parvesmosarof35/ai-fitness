@@ -88,3 +88,12 @@ func (s *AuthService) GenerateTokens(user *domain.User) (string, string, *domain
 
 	return accessString, refreshTokenString, user, nil
 }
+
+func (s *AuthService) Logout(userID string) error {
+	// For simplicity, revoke all active sessions for the user to ensure logout is comprehensive across devices
+	// Alternately, could pass specific refresh token and compare hash to delete just one session.
+	if err := s.db.Where("user_id = ?", userID).Delete(&domain.AuthSession{}).Error; err != nil {
+		return err
+	}
+	return nil
+}

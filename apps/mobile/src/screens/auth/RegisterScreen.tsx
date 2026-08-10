@@ -106,8 +106,8 @@ export default function RegisterScreen({ navigation }: Props) {
               <View className="flex-1 h-px bg-white/10" />
             </View>
 
-            <Button label="Continue with Google" variant="glass" />
-            <Button label="Continue with Apple" variant="glass" />
+            <Button label="Continue with Google" variant="secondary" />
+            <Button label="Continue with Apple" variant="secondary" />
           </View>
 
           <View className="flex-row justify-center mt-auto pb-4">

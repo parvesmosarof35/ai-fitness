@@ -1,24 +1,32 @@
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 import { AppProviders } from './AppProviders';
 import { RootNavigator } from '../navigation/RootNavigator';
 import { useAuthStore } from '../store/authStore';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const { isRestoringToken, bootstrapAsync } = useAuthStore();
 
   useEffect(() => {
-    bootstrapAsync();
+    async function prepare() {
+      try {
+        await bootstrapAsync();
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        await SplashScreen.hideAsync();
+      }
+    }
+    
+    prepare();
   }, [bootstrapAsync]);
 
   if (isRestoringToken) {
-    return (
-      <View className="flex-1 items-center justify-center bg-zinc-900">
-        <ActivityIndicator size="large" color="#34d399" />
-        <Text className="text-zinc-400 mt-4">Warming up...</Text>
-      </View>
-    );
+    return null; // Return null so the native splash screen stays visible
   }
 
   return (

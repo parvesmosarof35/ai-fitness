@@ -76,6 +76,12 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const authState = useAuthStore.getState();
+        const initialGeneration = authState.authGeneration;
+        if (authState.isSigningOut) {
+          throw new Error('Sign out in progress');
+        }
+
         const refreshToken = await getRefreshToken();
         if (!refreshToken) {
           throw new Error('No refresh token available');
@@ -85,6 +91,12 @@ apiClient.interceptors.response.use(
         const res = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {
           refreshToken,
         });
+
+        // Race condition check: Did the user sign out while we were fetching new tokens?
+        const currentAuthState = useAuthStore.getState();
+        if (currentAuthState.isSigningOut || currentAuthState.authGeneration !== initialGeneration) {
+           throw new Error('Auth state changed during refresh');
+        }
 
         const newAccessToken = res.data.accessToken;
         const newRefreshToken = res.data.refreshToken;
@@ -98,8 +110,11 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError as Error, null);
-        // Automatically sign the user out if refresh fails
-        useAuthStore.getState().signOut();
+        // Automatically sign the user out if refresh fails, only if not already signing out
+        const state = useAuthStore.getState();
+        if (!state.isSigningOut) {
+          state.signOut();
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

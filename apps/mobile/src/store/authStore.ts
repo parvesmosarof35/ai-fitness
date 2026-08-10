@@ -12,6 +12,8 @@ export interface User {
 interface AuthState {
   isRestoringToken: boolean;
   isAuthenticated: boolean;
+  isSigningOut: boolean;
+  authGeneration: number;
   hasCompletedOnboarding: boolean;
   hasSeenIntro: boolean;
   user: User | null;
@@ -22,21 +24,49 @@ interface AuthState {
   bootstrapAsync: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   isRestoringToken: true,
   isAuthenticated: false,
+  isSigningOut: false,
+  authGeneration: 0,
   hasCompletedOnboarding: false,
   hasSeenIntro: false,
   user: null,
 
   signIn: async (accessToken: string, refreshToken: string, user: User) => {
     await setTokens(accessToken, refreshToken);
-    set({ isAuthenticated: true, hasCompletedOnboarding: user.hasCompletedOnboarding, user });
+    set((state) => ({ 
+      isAuthenticated: true, 
+      hasCompletedOnboarding: user.hasCompletedOnboarding, 
+      user,
+      authGeneration: state.authGeneration + 1
+    }));
   },
 
   signOut: async () => {
-    await clearTokens();
-    set({ isAuthenticated: false, hasCompletedOnboarding: false, user: null });
+    // 1. Immediately mark user unauthenticated so UI transitions out
+    set((state) => ({ 
+      isAuthenticated: false, 
+      isSigningOut: true,
+      hasCompletedOnboarding: false, 
+      user: null,
+      authGeneration: state.authGeneration + 1 
+    }));
+
+    try {
+      // 2. Best-effort backend revocation
+      await apiClient.post('/auth/logout').catch(() => {
+        // Ignore backend failures (user might be offline)
+      });
+    } finally {
+      // 3. Clear local storage regardless of backend success
+      try {
+        await clearTokens();
+      } catch (e) {
+        console.error('Failed to clear secure tokens', e);
+      }
+      set({ isSigningOut: false });
+    }
   },
 
   completeOnboarding: async () => {

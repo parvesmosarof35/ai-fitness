@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"ai-fitness/api/internal/domain"
 	"ai-fitness/api/internal/service/profile"

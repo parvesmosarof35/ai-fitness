@@ -34,6 +34,11 @@ func NewRouter(cfg config.Config, authHandler *handler.AuthHandler, profileHandl
 		protected := v1.Group("")
 		protected.Use(middleware.JWTAuth(cfg))
 		{
+			authProtected := protected.Group("/auth")
+			{
+				authProtected.POST("/logout", authHandler.Logout)
+			}
+
 			me := protected.Group("/me")
 			{
 				me.GET("", profileHandler.GetMe)

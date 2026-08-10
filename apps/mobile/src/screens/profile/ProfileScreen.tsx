@@ -1,85 +1,365 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Modal, ActivityIndicator, Alert, StyleSheet, Dimensions } from 'react-native';
 import { useAuthStore } from '../../store/authStore';
-import { User, Settings, Shield, HelpCircle, LogOut, ChevronRight, Activity, Bell } from 'lucide-react-native';
+import { User, Settings, Shield, HelpCircle, LogOut, ChevronRight, Activity, Bell, Smartphone, Lock } from 'lucide-react-native';
+import { ForgeBackground } from '../../components/ui/ForgeBackground';
+import { ForgeHeader } from '../../components/ui/ForgeHeader';
+import { GlassCard } from '../../components/ui/GlassCard';
+import { Button } from '../../components/forms/Button';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const MenuOption = ({ icon: Icon, title, subtitle, onPress, destructive = false }: any) => (
+const { width } = Dimensions.get('window');
+
+const MenuOption = ({ icon: Icon, title, subtitle, onPress, destructive = false, isLast = false }: any) => (
   <TouchableOpacity 
-    className="flex-row items-center p-4 bg-zinc-900 border-b border-zinc-800/50" 
+    style={[styles.menuRow, !isLast && styles.menuRowBorder]}
     onPress={onPress}
     activeOpacity={0.7}
   >
-    <View className={`w-10 h-10 rounded-full items-center justify-center mr-4 ${destructive ? 'bg-red-500/10' : 'bg-zinc-800'}`}>
-      <Icon size={20} color={destructive ? '#ef4444' : '#a1a1aa'} />
+    <View style={[styles.menuIconWrapper, destructive ? styles.menuIconDestructive : styles.menuIconStandard]}>
+      <Icon size={20} color={destructive ? '#FF5F6D' : '#AAA7BA'} />
     </View>
-    <View className="flex-1">
-      <Text className={`text-base font-medium ${destructive ? 'text-red-500' : 'text-white'}`}>{title}</Text>
-      {subtitle && <Text className="text-zinc-500 text-sm mt-0.5">{subtitle}</Text>}
+    <View style={styles.menuTextContainer}>
+      <Text style={[styles.menuTitle, destructive && styles.menuTitleDestructive]}>{title}</Text>
+      {subtitle && <Text style={styles.menuSubtitle}>{subtitle}</Text>}
     </View>
-    {!destructive && <ChevronRight size={20} color="#52525b" />}
+    {!destructive && <ChevronRight size={20} color="#696678" />}
   </TouchableOpacity>
 );
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuthStore();
-  const userName = user?.email ? user.email.split('@')[0] : "Fitness Champion";
+  const { user, signOut, isSigningOut } = useAuthStore();
+  const userName = user?.email ? user.email.split('@')[0] : "Champion";
   
-  const handleSignOut = () => {
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Sign Out", style: "destructive", onPress: () => signOut() }
-      ]
-    );
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleConfirmSignOut = async () => {
+    setShowLogoutModal(false);
+    await signOut();
   };
 
   return (
-    <ScrollView className="flex-1 bg-zinc-950">
+    <ForgeBackground>
+      <ForgeHeader />
       
-      {/* Profile Header */}
-      <View className="items-center py-10 bg-zinc-900 border-b border-zinc-800">
-        <View className="w-24 h-24 bg-emerald-500/20 rounded-full items-center justify-center border-2 border-emerald-500 mb-4">
-          <Text className="text-emerald-400 font-bold text-4xl">{userName.charAt(0)}</Text>
-        </View>
-        <Text className="text-2xl font-black text-white">{userName}</Text>
-        <Text className="text-zinc-400 mt-1">Joined August 2026</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* Core Stats inside header */}
-        <View className="flex-row gap-8 mt-6">
-          <View className="items-center">
-            <Text className="text-xl font-bold text-white">70 kg</Text>
-            <Text className="text-zinc-500 text-xs uppercase tracking-wider mt-1">Weight</Text>
+        {/* Profile Header */}
+        <Animated.View entering={FadeInDown.duration(400).delay(100)} style={styles.headerArea}>
+          <View style={styles.avatarContainer}>
+            <LinearGradient
+              colors={['rgba(67, 230, 208, 0.4)', 'rgba(102, 92, 255, 0.4)']}
+              style={styles.avatarGlow}
+            />
+            <View style={styles.avatar}>
+               <Text style={styles.avatarInitial}>{userName.charAt(0).toUpperCase()}</Text>
+            </View>
           </View>
-          <View className="w-px h-full bg-zinc-700" />
-          <View className="items-center">
-            <Text className="text-xl font-bold text-white">175 cm</Text>
-            <Text className="text-zinc-500 text-xs uppercase tracking-wider mt-1">Height</Text>
+          
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.userEmail}>{user?.email || 'No email provided'}</Text>
+          <View style={styles.goalBadge}>
+             <Text style={styles.goalText}>BUILD STRENGTH</Text>
           </View>
-          <View className="w-px h-full bg-zinc-700" />
-          <View className="items-center">
-            <Text className="text-xl font-bold text-white">12</Text>
-            <Text className="text-zinc-500 text-xs uppercase tracking-wider mt-1">Workouts</Text>
+        </Animated.View>
+
+        {/* Profile Summary */}
+        <Animated.View entering={FadeInDown.duration(400).delay(200)} style={styles.section}>
+          <GlassCard style={styles.summaryCard}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryValue}>ADD</Text>
+              <Text style={styles.summaryLabel}>WEIGHT</Text>
+            </View>
+            <View style={styles.summaryDivider} />
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryValue}>ADD</Text>
+              <Text style={styles.summaryLabel}>HEIGHT</Text>
+            </View>
+            <View style={styles.summaryDivider} />
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryValue}>0</Text>
+              <Text style={styles.summaryLabel}>WORKOUTS</Text>
+            </View>
+          </GlassCard>
+        </Animated.View>
+
+        {/* Settings Groups */}
+        <Animated.View entering={FadeInDown.duration(400).delay(300)} style={styles.section}>
+          <Text style={styles.groupLabel}>PERSONAL</Text>
+          <GlassCard style={styles.groupCard}>
+            <MenuOption icon={User} title="Edit Profile" subtitle="Name, email and goals" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+            <MenuOption icon={Activity} title="Body Measurements" subtitle="Track your progress" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+            <MenuOption icon={Utensils} title="Dietary Preferences" subtitle="Vegan, keto, allergies" isLast onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+          </GlassCard>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.duration(400).delay(350)} style={styles.section}>
+          <Text style={styles.groupLabel}>EXPERIENCE</Text>
+          <GlassCard style={styles.groupCard}>
+            <MenuOption icon={Bell} title="Notifications" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+            <MenuOption icon={Smartphone} title="Sounds & Haptics" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+            <MenuOption icon={Settings} title="Units & Language" isLast onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+          </GlassCard>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.duration(400).delay(400)} style={styles.section}>
+          <Text style={styles.groupLabel}>ACCOUNT</Text>
+          <GlassCard style={styles.groupCard}>
+            <MenuOption icon={Lock} title="Privacy & Security" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+            <MenuOption icon={HelpCircle} title="Help & Support" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+            <MenuOption icon={Shield} title="About Forge AI" isLast onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
+          </GlassCard>
+        </Animated.View>
+
+        {/* Sign Out */}
+        <Animated.View entering={FadeInDown.duration(400).delay(450)} style={[styles.section, { marginTop: 16 }]}>
+          {isSigningOut ? (
+             <GlassCard style={{ padding: 24, alignItems: 'center' }}>
+               <ActivityIndicator color="#FF5F6D" />
+               <Text style={{ color: '#AAA7BA', marginTop: 12, fontFamily: 'System', fontWeight: '700' }}>Signing out...</Text>
+             </GlassCard>
+          ) : (
+            <GlassCard variant="danger" style={styles.groupCard}>
+              <MenuOption icon={LogOut} title="Sign Out" destructive isLast onPress={() => setShowLogoutModal(true)} />
+            </GlassCard>
+          )}
+        </Animated.View>
+        
+      </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <Modal visible={showLogoutModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalIconWrapper}>
+              <LogOut size={32} color="#FF5F6D" />
+            </View>
+            <Text style={styles.modalTitle}>SIGN OUT</Text>
+            <Text style={styles.modalSubtitle}>
+              Are you sure you want to sign out? You will need to log back in to access your workouts.
+            </Text>
+            
+            <View style={styles.modalActions}>
+              <Button label="CANCEL" onPress={() => setShowLogoutModal(false)} variant="secondary" style={{ flex: 1 }} />
+              <View style={{ width: 12 }} />
+              <Button label="SIGN OUT" onPress={handleConfirmSignOut} variant="destructive" style={{ flex: 1 }} />
+            </View>
           </View>
         </View>
-      </View>
-
-      <View className="py-6">
-        <Text className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Account Settings</Text>
-        <MenuOption icon={User} title="Edit Profile" subtitle="Update your body metrics and goals" />
-        <MenuOption icon={Activity} title="Dietary Preferences" subtitle="Manage vegan, keto, allergies" />
-        <MenuOption icon={Bell} title="Notifications" />
-
-        <Text className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-wider mt-8 mb-2">App & Support</Text>
-        <MenuOption icon={Settings} title="General Settings" />
-        <MenuOption icon={Shield} title="Privacy & Security" />
-        <MenuOption icon={HelpCircle} title="Help Center" />
-
-        <View className="mt-8 mb-12">
-          <MenuOption icon={LogOut} title="Sign Out" destructive onPress={handleSignOut} />
-        </View>
-      </View>
-    </ScrollView>
+      </Modal>
+    </ForgeBackground>
   );
 }
+
+// Need to import Utensils for the icon
+import { Utensils } from 'lucide-react-native';
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 120,
+  },
+  headerArea: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  avatarContainer: {
+    position: 'relative',
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatarGlow: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    opacity: 0.5,
+    filter: 'blur(10px)',
+  },
+  avatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#10101A',
+    borderWidth: 2,
+    borderColor: '#43E6D0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  avatarInitial: {
+    color: '#43E6D0',
+    fontFamily: 'System',
+    fontWeight: '900',
+    fontSize: 40,
+  },
+  userName: {
+    color: '#F7F5FF',
+    fontFamily: 'System',
+    fontWeight: '900',
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  userEmail: {
+    color: '#AAA7BA',
+    fontFamily: 'System',
+    fontWeight: '600',
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  goalBadge: {
+    backgroundColor: 'rgba(255, 138, 76, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 138, 76, 0.3)',
+  },
+  goalText: {
+    color: '#FF8A4C',
+    fontFamily: 'System',
+    fontWeight: '800',
+    fontSize: 10,
+    letterSpacing: 1,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  summaryCard: {
+    flexDirection: 'row',
+    padding: 0, // override default padding
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  summaryItem: {
+    flex: 1,
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  summaryValue: {
+    color: '#F7F5FF',
+    fontFamily: 'System',
+    fontWeight: '900',
+    fontSize: 18,
+    marginBottom: 4,
+  },
+  summaryLabel: {
+    color: '#696678',
+    fontFamily: 'System',
+    fontWeight: '800',
+    fontSize: 10,
+    letterSpacing: 1,
+  },
+  summaryDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  groupLabel: {
+    color: '#696678',
+    fontFamily: 'System',
+    fontWeight: '800',
+    fontSize: 12,
+    letterSpacing: 2,
+    marginBottom: 12,
+  },
+  groupCard: {
+    padding: 0,
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  menuRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  menuIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  menuIconStandard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  menuIconDestructive: {
+    backgroundColor: 'rgba(255, 95, 109, 0.1)',
+  },
+  menuTextContainer: {
+    flex: 1,
+  },
+  menuTitle: {
+    color: '#F7F5FF',
+    fontFamily: 'System',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  menuTitleDestructive: {
+    color: '#FF5F6D',
+  },
+  menuSubtitle: {
+    color: '#AAA7BA',
+    fontFamily: 'System',
+    fontWeight: '500',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(11, 11, 19, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    width: '100%',
+    backgroundColor: '#10101A',
+    borderRadius: 32,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+  },
+  modalIconWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 95, 109, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    color: '#F7F5FF',
+    fontFamily: 'System',
+    fontWeight: '900',
+    fontSize: 20,
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  modalSubtitle: {
+    color: '#AAA7BA',
+    fontFamily: 'System',
+    fontWeight: '500',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 32,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    width: '100%',
+  }
+});

@@ -84,3 +84,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		},
 	})
 }
+
+func (h *AuthHandler) Logout(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	if err := h.authService.Logout(userID.(string)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to logout"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+}
