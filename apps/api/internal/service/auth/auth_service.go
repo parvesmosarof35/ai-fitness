@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"ai-fitness/api/internal/config"
@@ -35,7 +36,7 @@ func (s *AuthService) Register(email, password string) (*domain.User, error) {
 	}
 
 	if err := s.db.Create(user).Error; err != nil {
-		if err.Error() == "UNIQUE constraint failed: users.email" || errors.Is(err, gorm.ErrDuplicatedKey) {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed: users.email") || errors.Is(err, gorm.ErrDuplicatedKey) {
 			return nil, errors.New("email already registered")
 		}
 		return nil, err
