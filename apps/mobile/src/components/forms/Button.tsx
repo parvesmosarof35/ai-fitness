@@ -37,10 +37,12 @@ export function Button({
   });
 
   const handlePressIn = () => {
+    // eslint-disable-next-line react-hooks/immutability
     scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
   };
 
   const handlePressOut = () => {
+    // eslint-disable-next-line react-hooks/immutability
     scale.value = withSpring(1, { damping: 15, stiffness: 300 });
   };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '../services/api/client';
+import { localStore, StorageKeys } from '../services/storage/localStore';
+import { WorkoutSession } from '../models/workout';
 
 export interface ProgressSummary {
   TotalWorkouts: number;
@@ -16,8 +17,30 @@ export function useProgress() {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.get('/progress/summary');
-      setSummary(response.data.data);
+      const history = await localStore.getItem<WorkoutSession[]>(StorageKeys.WORKOUT_HISTORY) || [];
+      
+      let totalWorkouts = 0;
+      let totalMinutes = 0;
+      let totalCalories = 0;
+      
+      history.forEach(session => {
+        if (session.status === 'completed') {
+          totalWorkouts += 1;
+          totalCalories += (session.caloriesBurned || 0);
+          
+          if (session.startTime && session.endTime) {
+            const start = new Date(session.startTime).getTime();
+            const end = new Date(session.endTime).getTime();
+            totalMinutes += Math.max(1, Math.floor((end - start) / 60000));
+          }
+        }
+      });
+      
+      setSummary({
+        TotalWorkouts: totalWorkouts,
+        TotalMinutes: totalMinutes,
+        TotalCalories: totalCalories
+      });
     } catch (err: any) {
       setError(err.message || 'Failed to fetch progress');
     } finally {
@@ -26,6 +49,7 @@ export function useProgress() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProgress();
   }, [fetchProgress]);
 

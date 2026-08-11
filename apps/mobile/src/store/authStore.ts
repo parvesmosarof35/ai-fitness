@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import { getAccessToken, setTokens, clearTokens } from '../services/storage/secureStorage';
-import { apiClient } from '../services/api/client';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { localStore, StorageKeys } from '../services/storage/localStore';
 
 export interface User {
   id: string;
@@ -9,15 +7,18 @@ export interface User {
   hasCompletedOnboarding: boolean;
 }
 
-interface AuthState {
-  isRestoringToken: boolean;
+interface AuthSession {
   isAuthenticated: boolean;
-  isSigningOut: boolean;
-  authGeneration: number;
   hasCompletedOnboarding: boolean;
   hasSeenIntro: boolean;
   user: User | null;
-  signIn: (accessToken: string, refreshToken: string, user: User) => Promise<void>;
+}
+
+interface AuthState extends AuthSession {
+  isRestoringToken: boolean;
+  isSigningOut: boolean;
+  authGeneration: number;
+  signIn: (user: User) => Promise<void>;
   signOut: () => Promise<void>;
   completeOnboarding: () => Promise<void>;
   setHasSeenIntro: () => Promise<void>;
@@ -33,18 +34,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   hasSeenIntro: false,
   user: null,
 
-  signIn: async (accessToken: string, refreshToken: string, user: User) => {
-    await setTokens(accessToken, refreshToken);
-    set((state) => ({ 
-      isAuthenticated: true, 
-      hasCompletedOnboarding: user.hasCompletedOnboarding, 
+  signIn: async (user: User) => {
+    const newState = {
+      isAuthenticated: true,
+      hasCompletedOnboarding: user.hasCompletedOnboarding,
+      hasSeenIntro: get().hasSeenIntro,
       user,
+    };
+    await localStore.setItem<AuthSession>(StorageKeys.AUTH_SESSION, newState);
+    set((state) => ({ 
+      ...newState,
       authGeneration: state.authGeneration + 1
     }));
   },
 
   signOut: async () => {
-    // 1. Immediately mark user unauthenticated so UI transitions out
     set((state) => ({ 
       isAuthenticated: false, 
       isSigningOut: true,
@@ -54,61 +58,70 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }));
 
     try {
-      // 2. Best-effort backend revocation
-      await apiClient.post('/auth/logout').catch(() => {
-        // Ignore backend failures (user might be offline)
-      });
+      await localStore.removeItem(StorageKeys.AUTH_SESSION);
+    } catch (e) {
+      console.error('Failed to clear local session', e);
     } finally {
-      // 3. Clear local storage regardless of backend success
-      try {
-        await clearTokens();
-      } catch (e) {
-        console.error('Failed to clear secure tokens', e);
-      }
       set({ isSigningOut: false });
     }
   },
 
   completeOnboarding: async () => {
-    set((state) => ({
+    const state = get();
+    const updatedUser = state.user ? { ...state.user, hasCompletedOnboarding: true } : null;
+    
+    const newState = {
+      isAuthenticated: state.isAuthenticated,
       hasCompletedOnboarding: true,
-      user: state.user ? { ...state.user, hasCompletedOnboarding: true } : null,
-    }));
+      hasSeenIntro: state.hasSeenIntro,
+      user: updatedUser,
+    };
+
+    await localStore.setItem<AuthSession>(StorageKeys.AUTH_SESSION, newState);
+
+    set({
+      hasCompletedOnboarding: true,
+      user: updatedUser,
+    });
   },
 
   setHasSeenIntro: async () => {
-    await AsyncStorage.setItem('hasSeenIntro', 'true');
+    const state = get();
+    const newState = {
+      isAuthenticated: state.isAuthenticated,
+      hasCompletedOnboarding: state.hasCompletedOnboarding,
+      hasSeenIntro: true,
+      user: state.user,
+    };
+    
+    await localStore.setItem<AuthSession>(StorageKeys.AUTH_SESSION, newState);
     set({ hasSeenIntro: true });
   },
 
   bootstrapAsync: async () => {
-    let token: string | null = null;
-    let user: User | null = null;
-    let hasCompletedOnboarding = false;
-    let hasSeenIntro = false;
-
     try {
-      const introStr = await AsyncStorage.getItem('hasSeenIntro');
-      hasSeenIntro = introStr === 'true';
-
-      token = await getAccessToken();
-      if (token) {
-        // Try fetching /me
-        const response = await apiClient.get('/me');
-        user = response.data.data.user;
-        hasCompletedOnboarding = user?.hasCompletedOnboarding || false;
+      const session = await localStore.getItem<AuthSession>(StorageKeys.AUTH_SESSION);
+      
+      if (session) {
+        set({
+          isAuthenticated: session.isAuthenticated,
+          hasCompletedOnboarding: session.hasCompletedOnboarding,
+          hasSeenIntro: session.hasSeenIntro,
+          user: session.user,
+          isRestoringToken: false,
+        });
+        return;
       }
     } catch (e) {
-      console.error('Failed to restore token or fetch profile', e);
-      token = null; 
+      console.error('Failed to restore session', e);
     }
 
     set({
-      isAuthenticated: !!token && !!user,
+      isAuthenticated: false,
       isRestoringToken: false,
-      hasCompletedOnboarding,
-      hasSeenIntro,
-      user,
+      hasCompletedOnboarding: false,
+      hasSeenIntro: false,
+      user: null,
     });
   },
 }));

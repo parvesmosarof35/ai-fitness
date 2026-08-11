@@ -8,24 +8,24 @@ interface SkeletonProps extends ViewProps {
 }
 
 export function Skeleton({ width = '100%', height = 20, borderRadius = 4, className = '', style, ...rest }: SkeletonProps) {
-  const opacity = useRef(new Animated.Value(0.3)).current;
+  const opacity = useRef(new Animated.Value(0.3));
 
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, {
+        Animated.timing(opacity.current, {
           toValue: 0.7,
           duration: 800,
           useNativeDriver: true,
         }),
-        Animated.timing(opacity, {
+        Animated.timing(opacity.current, {
           toValue: 0.3,
           duration: 800,
           useNativeDriver: true,
         }),
       ])
     ).start();
-  }, [opacity]);
+  }, []);
 
   return (
     <Animated.View
@@ -35,7 +35,8 @@ export function Skeleton({ width = '100%', height = 20, borderRadius = 4, classN
           width: width as any,
           height: height as any,
           borderRadius: borderRadius,
-          opacity: opacity,
+          // eslint-disable-next-line react-hooks/refs
+          opacity: opacity.current,
         },
         style,
       ]}

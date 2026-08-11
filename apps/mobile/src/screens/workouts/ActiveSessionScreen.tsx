@@ -42,7 +42,7 @@ export default function ActiveSessionScreen({ navigation }: Props) {
   const progressValue = useSharedValue(1);
 
   useEffect(() => {
-    if (state === 'synced' || state === 'sync_failed') {
+    if (state === 'completed' || state === 'save_failed') {
       navigation.replace('WorkoutComplete');
     }
   }, [state, navigation]);
@@ -122,7 +122,7 @@ export default function ActiveSessionScreen({ navigation }: Props) {
     );
   }
 
-  if (state === 'syncing' || state === 'completing') {
+  if (state === 'completing') {
     return (
       <View style={styles.centeredContainer}>
         <ActivityIndicator size="large" color="#43E6D0" />

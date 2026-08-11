@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ArrowLeft, Triangle } from 'lucide-react-native';
 
-import { apiClient } from '../../services/api/client';
+import * as Crypto from 'expo-crypto';
 import { AuthStackParamList } from '../../navigation/types';
 import { registerSchema, RegisterPayload } from '../../schemas/profile';
 import { useAuthStore } from '../../store/authStore';
@@ -24,12 +24,16 @@ export default function RegisterScreen({ navigation }: Props) {
 
   const onSubmit = async (data: RegisterPayload) => {
     try {
-      const response = await apiClient.post('/auth/register', { 
-        email: data.email, 
-        password: data.password, 
-      });
-      const user = response.data.data.user;
-      await signIn(response.data.data.accessToken, response.data.data.refreshToken, user);
+      // Mock registration delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const user = {
+        id: Crypto.randomUUID(),
+        email: data.email,
+        hasCompletedOnboarding: false,
+      };
+      
+      await signIn(user);
     } catch (e: any) {
       alert(e.message || 'Registration failed');
     }

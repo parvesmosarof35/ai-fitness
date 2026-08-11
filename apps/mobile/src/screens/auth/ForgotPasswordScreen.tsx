@@ -81,7 +81,7 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
                 <Text className="text-5xl font-black text-brand-cyan leading-tight tracking-tight">RESET</Text>
                 <Text className="text-5xl font-black text-white tracking-tight">PASSWORD</Text>
                 <Text className="text-zinc-400 mt-6">
-                  No sweat! Enter your email and we'll get you back to the grind.
+                  No sweat! Enter your email and we&apos;ll get you back to the grind.
                 </Text>
               </View>
 

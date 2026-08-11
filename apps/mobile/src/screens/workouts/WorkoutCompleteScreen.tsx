@@ -18,7 +18,7 @@ export default function WorkoutCompleteScreen({ navigation }: Props) {
 
   const durationMinutes = startTime 
     // eslint-disable-next-line react-hooks/purity
-    ? Math.max(1, Math.floor((Date.now() - startTime) / 60000))
+    ? Math.max(1, Math.floor((Date.now() - new Date(startTime).getTime()) / 60000))
     : 0;
 
   const totalSets = completedSets.length;
@@ -39,11 +39,11 @@ export default function WorkoutCompleteScreen({ navigation }: Props) {
         {plan?.title || "Your Workout"}
       </Text>
       
-      {state === 'sync_failed' && (
-         <Text className="text-brand-orange font-bold text-xs mb-8">Waiting to sync...</Text>
+      {state === 'save_failed' && (
+         <Text className="text-brand-orange font-bold text-xs mb-8">Could not save workout on this device.</Text>
       )}
-      {state === 'synced' && (
-         <Text className="text-brand-cyan font-bold text-xs mb-8">Progress saved to profile.</Text>
+      {state === 'completed' && (
+         <Text className="text-brand-cyan font-bold text-xs mb-8">Workout saved on this device.</Text>
       )}
 
       <View className="flex-row flex-wrap gap-4 mb-12 w-full justify-center">

@@ -7,7 +7,7 @@ import { Input } from '../../components/forms/Input';
 import { Button } from '../../components/forms/Button';
 import { useAuthStore } from '../../store/authStore';
 import { ftInToCm, lbsToKg } from '../../features/onboarding/utils';
-import { apiClient } from '../../services/api/client';
+import { localStore, StorageKeys } from '../../services/storage/localStore';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { TouchableCard } from '../../components/ui/Card';
 import { Target, Zap, Activity, Dumbbell, Flame, CheckCircle2 } from 'lucide-react-native';
@@ -45,7 +45,7 @@ export default function OnboardingStartScreen() {
     }
 
     try {
-      await apiClient.put('/me/profile/onboarding', {
+      const profile = {
         age: Number(data.age),
         language: data.language,
         unitSystem: data.unitSystem,
@@ -56,7 +56,13 @@ export default function OnboardingStartScreen() {
         dailyTimeMinutes: Number(data.dailyTimeMinutes),
         dietaryPreferences: data.dietaryPreferences ? [data.dietaryPreferences] : [],
         healthDisclaimerAccepted: data.healthDisclaimerAccepted
-      });
+      };
+      
+      const success = await localStore.setItem(StorageKeys.ONBOARDING_PROFILE, profile);
+      if (!success) {
+        throw new Error("Failed to save profile locally");
+      }
+      
       await completeOnboarding();
     } catch (e: any) {
       Alert.alert("Onboarding Error", e.message || "Failed to save profile");
@@ -98,7 +104,7 @@ export default function OnboardingStartScreen() {
         {step === 1 && (
           <View className="flex-1 justify-center">
             <Text className="text-4xl font-black text-white mb-2">Welcome to AI Fitness</Text>
-            <Text className="text-lg text-zinc-400 mb-10">Let's personalize your journey.</Text>
+            <Text className="text-lg text-zinc-400 mb-10">Let&apos;s personalize your journey.</Text>
             
             <View className="space-y-4">
               <Input name="age" control={control} label="Your Age" keyboardType="numeric" placeholder="e.g. 25" />
@@ -221,7 +227,7 @@ export default function OnboardingStartScreen() {
               <View className="bg-emerald-500/20 p-6 rounded-full mb-6">
                 <CheckCircle2 color="#34d399" size={64} />
               </View>
-              <Text className="text-3xl font-bold text-white text-center mb-2">You're All Set!</Text>
+              <Text className="text-3xl font-bold text-white text-center mb-2">You&apos;re All Set!</Text>
               <Text className="text-zinc-400 text-center">Our AI will generate your personalized workout plan.</Text>
             </View>
 

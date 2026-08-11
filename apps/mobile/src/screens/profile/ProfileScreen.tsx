@@ -9,6 +9,9 @@ import { Button } from '../../components/forms/Button';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// Need to import Utensils for the icon
+import { Utensils } from 'lucide-react-native';
+
 const { width } = Dimensions.get('window');
 
 const MenuOption = ({ icon: Icon, title, subtitle, onPress, destructive = false, isLast = false }: any) => (
@@ -151,9 +154,6 @@ export default function ProfileScreen() {
     </ForgeBackground>
   );
 }
-
-// Need to import Utensils for the icon
-import { Utensils } from 'lucide-react-native';
 
 const styles = StyleSheet.create({
   scrollContent: {

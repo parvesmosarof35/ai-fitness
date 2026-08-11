@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect , useState } from 'react';
 const useCameraPermission = () => ({ hasPermission: true, requestPermission: async () => true });
 
 export function useCameraPermissions() {

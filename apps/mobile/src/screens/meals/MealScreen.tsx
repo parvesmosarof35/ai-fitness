@@ -103,7 +103,7 @@ export default function MealScreen() {
 
         {/* Meal Timeline */}
         <Animated.View entering={FadeInDown.duration(400).delay(300)} style={{ paddingHorizontal: 24 }}>
-          <Text style={styles.sectionLabel}>TODAY'S LOG</Text>
+          <Text style={styles.sectionLabel}>TODAY&apos;S LOG</Text>
           
           {meals.length === 0 ? (
             <GlassCard style={styles.emptyState}>

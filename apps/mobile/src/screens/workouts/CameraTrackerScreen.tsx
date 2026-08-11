@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-const Camera = (props: any) => null;
-const useCameraDevice = (dir: string) => null;
 import { WorkoutStackParamList } from '../../navigation/types';
 import { useCameraPermissions } from '../../features/camera/useCameraPermissions';
 import { mockProcessFrame } from '../../features/camera/poseProcessor';
+const Camera = (props: any) => null;
+const useCameraDevice = (dir: string) => null;
 
 type Props = NativeStackScreenProps<WorkoutStackParamList, 'CameraTracker'>;
 

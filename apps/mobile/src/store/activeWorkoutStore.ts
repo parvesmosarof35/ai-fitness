@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { WorkoutPlan, WorkoutSession, WorkoutSetLog, WorkoutExercise } from '../hooks/useWorkouts';
+import { WorkoutPlan, WorkoutSession, WorkoutSetLog, WorkoutExercise } from '../models/workout';
 import * as Crypto from 'expo-crypto';
-import { apiClient } from '../services/api/client';
 import { feedback } from '../services/FeedbackService';
+import { localStore, StorageKeys } from '../services/storage/localStore';
 
 export type WorkoutState = 
   | 'idle'
@@ -14,9 +14,7 @@ export type WorkoutState =
   | 'paused'
   | 'completing'
   | 'completed'
-  | 'syncing'
-  | 'synced'
-  | 'sync_failed';
+  | 'save_failed';
 
 interface ActiveWorkoutState {
   state: WorkoutState;
@@ -25,7 +23,7 @@ interface ActiveWorkoutState {
   sessionId: string | null;
   clientEventId: string | null;
   plan: WorkoutPlan | null;
-  startTime: number | null;
+  startTime: string | null;
   
   // Current Progress
   currentExerciseIndex: number;
@@ -47,7 +45,6 @@ interface ActiveWorkoutState {
   finishRest: () => void;
   finishWorkout: () => Promise<void>;
   abortWorkout: () => void;
-  syncFailedSession: () => Promise<void>;
   
   // Helpers
   getCurrentExercise: () => WorkoutExercise | null;
@@ -79,25 +76,19 @@ export const useActiveWorkoutStore = create<ActiveWorkoutState>()(
 
       startWorkout: async (plan: WorkoutPlan) => {
         feedback.buttonTap();
+        const sessionId = Crypto.randomUUID();
         const clientEventId = Crypto.randomUUID();
         set({
-          state: 'starting',
+          state: 'active',
+          sessionId,
           clientEventId,
           plan,
           currentExerciseIndex: 0,
           currentSetIndex: 0,
           completedSets: [],
-          startTime: Date.now(),
+          startTime: new Date().toISOString(),
           totalPausedMs: 0,
         });
-
-        try {
-          const res = await apiClient.post('/workout-sessions', { clientEventId, planId: plan.id });
-          set({ sessionId: res.data.data.id, state: 'active' });
-        } catch (e) {
-          console.warn("Failed to create session on backend", e);
-          set({ state: 'active' });
-        }
       },
 
       resumeWorkout: () => {
@@ -126,6 +117,7 @@ export const useActiveWorkoutStore = create<ActiveWorkoutState>()(
 
         const exercise = plan.exercises[currentExerciseIndex];
         const newSet: WorkoutSetLog = {
+          id: Crypto.randomUUID(),
           exerciseId: exercise.id,
           setNumber: currentSetIndex + 1,
           reps: reps ?? exercise.targetReps ?? null,
@@ -182,36 +174,40 @@ export const useActiveWorkoutStore = create<ActiveWorkoutState>()(
 
       finishWorkout: async () => {
         feedback.workoutComplete();
-        const { clientEventId, sessionId, completedSets } = get();
-        set({ state: 'syncing' });
+        const { clientEventId, sessionId, plan, startTime, completedSets } = get();
+        
+        if (!sessionId || !clientEventId || !plan || !startTime) {
+          set({ state: 'save_failed' });
+          return;
+        }
+        
+        const caloriesBurned = Math.floor(Math.random() * (500 - 300 + 1) + 300);
+        
+        const sessionToSave: WorkoutSession = {
+          id: sessionId,
+          clientEventId,
+          planId: plan.id,
+          startTime,
+          endTime: new Date().toISOString(),
+          status: 'completed',
+          caloriesBurned,
+          logs: completedSets,
+        };
 
         try {
-          const caloriesBurned = Math.floor(Math.random() * (500 - 300 + 1) + 300);
+          const currentHistory = await localStore.getItem<WorkoutSession[]>(StorageKeys.WORKOUT_HISTORY) || [];
+          const updatedHistory = [sessionToSave, ...currentHistory];
+          const success = await localStore.setItem(StorageKeys.WORKOUT_HISTORY, updatedHistory);
           
-          if (sessionId) {
-            await apiClient.put(`/workout-sessions/${sessionId}/complete`, {
-              clientEventId,
-              caloriesBurned,
-              logs: completedSets,
-            });
+          if (success) {
+            set({ state: 'completed' });
           } else {
-            const res = await apiClient.post('/workout-sessions', { clientEventId });
-            const newSessionId = res.data.data.id;
-            await apiClient.put(`/workout-sessions/${newSessionId}/complete`, {
-              clientEventId,
-              caloriesBurned,
-              logs: completedSets,
-            });
+            set({ state: 'save_failed' });
           }
-          set({ state: 'synced' });
         } catch (e) {
-          console.warn("Sync failed", e);
-          set({ state: 'sync_failed' });
+          console.warn("Local save failed", e);
+          set({ state: 'save_failed' });
         }
-      },
-
-      syncFailedSession: async () => {
-        await get().finishWorkout();
       },
 
       abortWorkout: () => {
@@ -222,9 +218,12 @@ export const useActiveWorkoutStore = create<ActiveWorkoutState>()(
           clientEventId: null,
           plan: null,
           startTime: null,
+          currentExerciseIndex: 0,
+          currentSetIndex: 0,
           completedSets: [],
           restEndTimestamp: null,
           pauseStartTimestamp: null,
+          totalPausedMs: 0,
         });
       }
 

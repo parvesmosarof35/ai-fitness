@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Sparkles, ArrowLeft } from 'lucide-react-native';
 
-import { apiClient } from '../../services/api/client';
+import * as Crypto from 'expo-crypto';
 import { AuthStackParamList } from '../../navigation/types';
 import { loginSchema, LoginPayload } from '../../schemas/profile';
 import { useAuthStore } from '../../store/authStore';
@@ -24,9 +24,16 @@ export default function LoginScreen({ navigation }: Props) {
 
   const onSubmit = async (data: LoginPayload) => {
     try {
-      const response = await apiClient.post('/auth/login', { email: data.email, password: data.password });
-      const user = response.data.data.user;
-      await signIn(response.data.data.accessToken, response.data.data.refreshToken, user);
+      // Mock login delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const user = {
+        id: Crypto.randomUUID(),
+        email: data.email,
+        hasCompletedOnboarding: false, // Defaulting to false, they'll complete it next
+      };
+      
+      await signIn(user);
     } catch (e: any) {
       alert(e.message || 'Login failed');
     }
@@ -102,7 +109,7 @@ export default function LoginScreen({ navigation }: Props) {
           </View>
 
           <View className="flex-row justify-center mt-auto pb-4">
-            <Text className="text-zinc-400">Don't have an account? </Text>
+            <Text className="text-zinc-400">Don&apos;t have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text className="text-brand-cyan font-bold">Create Account</Text>
             </TouchableOpacity>
