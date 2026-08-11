@@ -8,6 +8,7 @@ import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
 
 import { IntroScreen } from '../screens/intro/IntroScreen';
+import CoachChatScreen from '../screens/coach/CoachChatScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -27,7 +28,10 @@ export function RootNavigator() {
         <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
       ) : (
         // User is signed in and has completed onboarding
-        <Stack.Screen name="Main" component={MainTabNavigator} />
+        <Stack.Group>
+          <Stack.Screen name="Main" component={MainTabNavigator} />
+          <Stack.Screen name="AICoachChat" component={CoachChatScreen} options={{ presentation: 'fullScreenModal' }} />
+        </Stack.Group>
       )}
     </Stack.Navigator>
   );

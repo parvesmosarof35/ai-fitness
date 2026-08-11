@@ -4,6 +4,8 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
+  CheckEmail: undefined;
+  NewPassword: undefined;
 };
 
 export type OnboardingStackParamList = {
@@ -31,6 +33,7 @@ export type RootStackParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList>;
   Onboarding: NavigatorScreenParams<OnboardingStackParamList>;
   Main: NavigatorScreenParams<MainTabParamList>;
+  AICoachChat: undefined;
 };
 
 declare global {

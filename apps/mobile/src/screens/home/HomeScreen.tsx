@@ -1,18 +1,16 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, Platform, ImageBackground } from 'react-native';
 import { useAuthStore } from '../../store/authStore';
 import { useWorkouts } from '../../hooks/useWorkouts';
 import { useActiveWorkoutStore } from '../../store/activeWorkoutStore';
-import { ForgeBackground } from '../../components/ui/ForgeBackground';
-import { ForgeHeader } from '../../components/ui/ForgeHeader';
-import { GlassCard } from '../../components/ui/GlassCard';
-import { Button } from '../../components/forms/Button';
-import { Bot, Camera, Dumbbell, Play, Search, Utensils } from 'lucide-react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { WorkoutStackParamList } from '../../navigation/types';
+import { Search, Bell, Sparkles, Flame, Zap, Scale, Droplet, Utensils, ArrowRight, Clock } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { BrandGradient } from '../../components/ui/BrandGradient';
 
 type Props = { navigation: any };
+
+const HERO_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuDMQ2gyy8i--nNylcF0C0QNoVbdtCOQSDFP1gGY-b1_B1d1BOnoHhzNQ8KVKdji8Yg5p8_MRjwcCewTDnj7Yf3pMnix6R2gIQNYXPPxmM6CtnyyWBBsjl_i7JDmbGel3pjErkAiYHLsiGgEeXhRHl3IfjNVodRZbkTMM1ArGv6UuBhXIzU395HHMvU31MUx8hha_WxmaLlFkG6Ldngks0BWpuNzgLkJrRmAidSlZJXyHyMPaBXH5C__";
+const PROFILE_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuBpzRq8eWqGhw_DLOWqLck5bfKLPPJXOSbYuUDkWmVHysDySmSZE5f_7yu7BUOdg5meGjrUq-AiPVw6TPCOO2zYclzCXcD4gpIZY2mS1PYpbrqIZYOre4R0sKmYacTEtsaAunOpJGmWRLOBZVngAgYUcvxQpik7mEcCTeBVFOeisieq9P6dL-3kdSAqr35ArVrMBbA-updOXRHqzkXiiillGPlUSzGh8q1J5iw6BZvO7h5oLhTyUCMG";
 
 export default function HomeScreen({ navigation }: Props) {
   const { user } = useAuthStore();
@@ -20,300 +18,235 @@ export default function HomeScreen({ navigation }: Props) {
   const { plans, loading } = useWorkouts();
   const { state, resumeWorkout, plan: activePlan } = useActiveWorkoutStore();
 
-  const todayPlan = plans[0];
-
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'GOOD MORNING';
-    if (hour < 18) return 'GOOD AFTERNOON';
-    return 'GOOD EVENING';
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
   };
 
+  const todayPlan = plans[0];
+
   return (
-    <ForgeBackground>
-      <ForgeHeader 
-        showProfile 
-        profileName={userName}
-        showNotification 
-      />
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 120 }}>
+    <View className="flex-1 bg-[#13121c]">
+      {/* Background Orbs */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        <View style={{ position: 'absolute', top: -100, left: -100, width: 400, height: 400, borderRadius: 200, backgroundColor: 'rgba(108,92,255,0.15)', filter: 'blur(100px)' }} />
+        <View style={{ position: 'absolute', bottom: 100, right: -50, width: 320, height: 320, borderRadius: 160, backgroundColor: 'rgba(0,205,168,0.15)', filter: 'blur(100px)' }} />
+      </View>
+
+      {/* Top App Bar */}
+      <View style={{ paddingTop: Platform.OS === 'android' ? 50 : 60, paddingHorizontal: 24, paddingBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(19,18,28,0.8)', zIndex: 50 }}>
+        <TouchableOpacity 
+          activeOpacity={0.7} 
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+          onPress={() => navigation.navigate('AICoachChat')}
+        >
+          <Sparkles color="#44eac3" size={28} />
+          <Text style={{ color: '#44eac3', fontSize: 24, fontWeight: '900', fontStyle: 'italic', letterSpacing: -0.5 }}>AURA</Text>
+        </TouchableOpacity>
         
-        {/* Hero Title */}
-        <Animated.View entering={FadeInDown.duration(400).delay(100)} className="px-6 mb-8 mt-2">
-          <Text className="text-zinc-500 font-bold mb-2 tracking-[0.2em] uppercase text-xs">{getGreeting()}, {userName}</Text>
-          <Text style={styles.heroLine1}>READY TO</Text>
-          <Text style={styles.heroLine2}>TRAIN?</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+          <TouchableOpacity activeOpacity={0.7}>
+            <Search color="#c8c4d8" size={24} />
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.7}>
+            <View>
+              <Bell color="#c8c4d8" size={24} />
+              <View style={{ position: 'absolute', top: 0, right: 2, width: 8, height: 8, borderRadius: 4, backgroundColor: '#44eac3' }} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Profile')}>
+            <View style={{ width: 40, height: 40, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(68,234,195,0.3)' }}>
+              <Image source={{ uri: PROFILE_IMG }} style={{ width: '100%', height: '100%' }} />
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 24, paddingTop: 24 }}>
+        
+        {/* Greeting Section */}
+        <Animated.View entering={FadeInDown.duration(400).delay(100)} className="mb-10">
+          <Text style={{ color: '#918ea1', fontSize: 12, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 8 }}>
+            {getGreeting()}, {userName} 👋
+          </Text>
+          <View>
+            <Text style={{ fontSize: 48, fontWeight: '900', fontStyle: 'italic', color: '#6c5cff', lineHeight: 48, letterSpacing: -1.76 }}>TRAIN</Text>
+            <Text style={{ fontSize: 48, fontWeight: '900', fontStyle: 'italic', color: '#ffb68c', lineHeight: 48, letterSpacing: -1.76 }}>TODAY</Text>
+          </View>
         </Animated.View>
 
-        {/* Today's Workout Hero */}
-        <Animated.View entering={FadeInDown.duration(400).delay(200)} className="px-6 mb-8">
-          {state === 'active' || state === 'resting' || state === 'paused' ? (
-            <GlassCard variant="selected" style={{ padding: 0 }}>
-              <View className="p-6">
-                <Text className="text-brand-cyan font-bold mb-2 uppercase text-[10px] tracking-widest">In Progress</Text>
-                <Text className="text-white font-black text-3xl tracking-tight mb-6">{activePlan?.title}</Text>
-                <Button 
-                  label="Resume Workout" 
-                  onPress={() => {
-                    resumeWorkout();
-                    navigation.navigate('Workout', { screen: 'ActiveSession' });
-                  }} 
-                  variant="primary"
-                  leftIcon={<Play color="#0B0B13" size={18} fill="#0B0B13" />}
-                />
-              </View>
-            </GlassCard>
-          ) : loading ? (
-            <GlassCard variant="elevated" style={{ alignItems: 'center', justifyContent: 'center', padding: 40 }}>
-               <ActivityIndicator color="#43E6D0" />
-               <Text className="text-zinc-500 mt-4 font-bold text-xs uppercase tracking-wider">Loading your plan...</Text>
-            </GlassCard>
-          ) : todayPlan ? (
-            <GlassCard variant="hero" style={{ padding: 0 }}>
-              <View className="h-48 relative bg-[#10101A] justify-center items-center">
-                <Dumbbell color="#1B1B2A" size={64} />
-                <View className="absolute inset-0 bg-brand-violet/20" />
-                <View className="absolute bottom-6 left-6 right-6">
-                  <Text className="text-brand-cyan font-bold mb-1 uppercase text-[10px] tracking-widest">
-                    {todayPlan.generatedByAI ? 'AI Generated' : 'Today\'s Plan'}
-                  </Text>
-                  <Text className="text-white font-black text-3xl tracking-tight leading-none mb-2">{todayPlan.title}</Text>
-                  <View className="flex-row items-center gap-3">
-                    <Text className="text-zinc-400 text-xs font-bold uppercase tracking-wider">{todayPlan.estimatedDurationMinutes} min</Text>
-                    <View className="w-1 h-1 bg-zinc-700 rounded-full" />
-                    <Text className="text-zinc-400 text-xs font-bold uppercase tracking-wider">{todayPlan.difficulty}</Text>
-                    <View className="w-1 h-1 bg-zinc-700 rounded-full" />
-                    <Text className="text-zinc-400 text-xs font-bold uppercase tracking-wider">{todayPlan.exercises.length} Exercises</Text>
-                  </View>
+        {/* AI Workout Hero */}
+        <Animated.View entering={FadeInDown.duration(400).delay(200)} className="mb-10">
+          <View style={{ borderRadius: 32, overflow: 'hidden', minHeight: 360, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+            <ImageBackground source={{ uri: HERO_IMG }} style={{ ...StyleSheet.absoluteFillObject, opacity: 0.6 }} imageStyle={{ resizeMode: 'cover' }} />
+            <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(19,18,28,0.5)' }} />
+            
+            <View style={{ flex: 1, justifyContent: 'flex-end', padding: 24 }}>
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+                <View style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)' }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>INTERMEDIATE</Text>
+                </View>
+                <View style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)' }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>420 KCAL</Text>
                 </View>
               </View>
-              <View className="p-6">
-                <Button 
-                  label="Start Workout" 
-                  onPress={() => navigation.navigate('Workout', { screen: 'WorkoutOverview', params: { workoutId: todayPlan.id }})} 
-                  variant="primary"
-                />
-              </View>
-            </GlassCard>
-          ) : (
-            <GlassCard variant="elevated" style={{ padding: 32, alignItems: 'center' }}>
-               <Text className="text-white font-black text-xl mb-2">Build Your Plan</Text>
-               <Text className="text-zinc-400 font-medium text-center mb-6 text-sm">
-                 Generate a workout based on your goals, time and equipment.
-               </Text>
-               <Button 
-                 label="Generate Plan" 
-                 onPress={() => Alert.alert('Coming Soon', 'Generate is coming soon.')} 
-                 variant="primary"
-                 fullWidth
-               />
-            </GlassCard>
-          )}
-        </Animated.View>
 
-        {/* Weekly Activity */}
-        <Animated.View entering={FadeInDown.duration(400).delay(300)} className="px-6 mb-8">
-          <View className="flex-row justify-between items-end mb-4">
-            <Text className="text-white font-black text-lg uppercase tracking-wider">Weekly Activity</Text>
-            <View className="bg-brand-violet/20 px-3 py-1 rounded-full border border-brand-violet/30">
-              <Text className="text-brand-violetLight font-bold text-[10px] uppercase tracking-widest">3 Day Streak</Text>
+              <Text style={{ color: '#918ea1', fontSize: 12, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>TODAY'S AI WORKOUT</Text>
+              <Text style={{ color: '#ffffff', fontSize: 28, fontWeight: '900', fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 32, marginBottom: 16, textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 }}>
+                UPPER BODY{'\n'}STRENGTH
+              </Text>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 24 }}>
+                <Clock color="#c8c4d8" size={16} />
+                <Text style={{ color: '#c8c4d8', fontSize: 12, fontWeight: '700', textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>45 MIN SESSION</Text>
+              </View>
+
+              <TouchableOpacity 
+                activeOpacity={0.8}
+                onPress={() => todayPlan ? navigation.navigate('Workouts', { screen: 'WorkoutOverview', params: { workoutId: todayPlan.id }}) : Alert.alert('Coming Soon', 'Generating workout...')}
+              >
+                <BrandGradient colors={['#6c5cff', '#44eac3'] as any} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 9999, shadowColor: '#6c5cff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
+                  <View style={{ paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      {state === 'active' || state === 'resting' ? 'RESUME WORKOUT' : 'START WORKOUT'}
+                    </Text>
+                    <ArrowRight color="#ffffff" size={18} />
+                  </View>
+                </BrandGradient>
+              </TouchableOpacity>
             </View>
           </View>
-          <GlassCard style={{ padding: 16 }}>
-             <View className="flex-row justify-between items-center">
-               {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, index) => {
-                 // Mocking data logic for now: T, W completed. T is current.
-                 const isCompleted = index === 1 || index === 2;
-                 const isCurrent = index === 3;
-                 
-                 let circleStyle = styles.dayCircleMuted;
-                 let textStyle = styles.dayTextMuted;
-                 
-                 if (isCompleted) {
-                   circleStyle = styles.dayCircleCompleted;
-                   textStyle = styles.dayTextCompleted;
-                 } else if (isCurrent) {
-                   circleStyle = styles.dayCircleCurrent;
-                   textStyle = styles.dayTextCurrent;
-                 }
-
-                 return (
-                   <View key={index} className="items-center">
-                     <View style={[styles.dayCircle, circleStyle]}>
-                       {isCompleted && <Text style={{ color: '#0B0B13', fontSize: 12, fontWeight: 'bold' }}>✓</Text>}
-                     </View>
-                     <Text style={[styles.dayText, textStyle]}>{day}</Text>
-                   </View>
-                 );
-               })}
-             </View>
-          </GlassCard>
         </Animated.View>
 
-        {/* Quick Actions */}
-        <Animated.View entering={FadeInDown.duration(400).delay(400)} className="px-6 mb-8">
-          <Text className="text-white font-black text-lg mb-4 uppercase tracking-wider">Quick Actions</Text>
-          <View className="flex-row flex-wrap gap-4">
-            <TouchableOpacity 
-              style={styles.quickAction} 
-              activeOpacity={0.7} 
-              onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')}
-            >
-              <GlassCard style={{ padding: 20, alignItems: 'center' }}>
-                <View style={styles.iconWrapperViolet}>
-                  <Bot color="#9388FF" size={24} />
+        {/* Metrics Grid */}
+        <Animated.View entering={FadeInDown.duration(400).delay(300)} className="mb-10">
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between' }}>
+            
+            {/* Calories */}
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <Text style={styles.metricTitle}>CALORIES</Text>
+                <Flame color="#44eac3" size={20} />
+              </View>
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.metricValue}>1,240</Text>
+                <Text style={styles.metricSub}>KCAL BURNED</Text>
+              </View>
+            </View>
+
+            {/* Streak */}
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <Text style={styles.metricTitle}>STREAK</Text>
+                <Zap color="#918ea1" size={20} />
+              </View>
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.metricValue}>12</Text>
+                <Text style={styles.metricSub}>DAYS ACTIVE</Text>
+              </View>
+            </View>
+
+            {/* Weight */}
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <Text style={styles.metricTitle}>WEIGHT</Text>
+                <Scale color="#ffb68c" size={20} />
+              </View>
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.metricValue}>76.4</Text>
+                <Text style={styles.metricSub}>KG CURRENT</Text>
+              </View>
+            </View>
+
+            {/* Water */}
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <Text style={styles.metricTitle}>WATER</Text>
+                <Droplet color="#00cda8" size={20} />
+              </View>
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.metricValue}>1.8</Text>
+                <Text style={styles.metricSub}>LITERS TODAY</Text>
+              </View>
+            </View>
+
+          </View>
+        </Animated.View>
+
+        {/* Nutrition Summary */}
+        <Animated.View entering={FadeInDown.duration(400).delay(400)} className="mb-10">
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 24, padding: 24 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <Text style={{ color: '#ffffff', fontSize: 18, fontWeight: '700' }}>Today's Nutrition</Text>
+              <Utensils color="#ffb68c" size={20} />
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 8, marginBottom: 24 }}>
+              {[
+                { label: 'CAL', color: '#6c5cff', height: '60%' },
+                { label: 'PRO', color: '#44eac3', height: '80%' },
+                { label: 'CARB', color: '#ffb68c', height: '40%' },
+                { label: 'FAT', color: '#ffb4ab', height: '30%' },
+              ].map(macro => (
+                <View key={macro.label} style={{ alignItems: 'center', gap: 8 }}>
+                  <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#2a2933', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' }}>
+                    <View style={{ position: 'absolute', bottom: 0, width: '100%', height: macro.height, backgroundColor: macro.color }} />
+                  </View>
+                  <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>{macro.label}</Text>
                 </View>
-                <Text style={styles.quickActionTitle}>Generate</Text>
-                <Text style={styles.quickActionSubtitle}>New Plan</Text>
-              </GlassCard>
-            </TouchableOpacity>
+              ))}
+            </View>
 
             <TouchableOpacity 
-              style={styles.quickAction} 
-              activeOpacity={0.7} 
+              activeOpacity={0.7}
               onPress={() => navigation.navigate('Meals')}
+              style={{ width: '100%', paddingVertical: 12, borderRadius: 9999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
-              <GlassCard style={{ padding: 20, alignItems: 'center' }}>
-                <View style={styles.iconWrapperOrange}>
-                  <Utensils color="#FF8A4C" size={24} />
-                </View>
-                <Text style={styles.quickActionTitle}>Scan</Text>
-                <Text style={styles.quickActionSubtitle}>Meal Log</Text>
-              </GlassCard>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickAction} 
-              activeOpacity={0.7} 
-              onPress={() => navigation.navigate('Workouts')}
-            >
-              <GlassCard style={{ padding: 20, alignItems: 'center' }}>
-                <View style={styles.iconWrapperCyan}>
-                  <Search color="#43E6D0" size={24} />
-                </View>
-                <Text style={styles.quickActionTitle}>Browse</Text>
-                <Text style={styles.quickActionSubtitle}>Workouts</Text>
-              </GlassCard>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickAction} 
-              activeOpacity={0.7} 
-              onPress={() => Alert.alert('Coming Soon', 'AI Coach tracking is coming soon!')}
-            >
-              <GlassCard style={{ padding: 20, alignItems: 'center' }}>
-                <View style={styles.iconWrapperNeutral}>
-                  <Camera color="#AAA7BA" size={24} />
-                </View>
-                <Text style={styles.quickActionTitle}>Track</Text>
-                <Text style={styles.quickActionSubtitle}>AI Coach</Text>
-              </GlassCard>
+              <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '800', textTransform: 'uppercase' }}>VIEW NUTRITION</Text>
+              <ArrowRight color="#ffffff" size={16} />
             </TouchableOpacity>
           </View>
         </Animated.View>
 
       </ScrollView>
-    </ForgeBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  heroLine1: {
-    fontFamily: 'System',
-    fontWeight: '900',
-    fontSize: 48,
-    color: '#665CFF', // Violet
-    letterSpacing: -1,
-    lineHeight: 48,
-  },
-  heroLine2: {
-    fontFamily: 'System',
-    fontWeight: '900',
-    fontSize: 48,
-    color: '#43E6D0', // Cyan
-    letterSpacing: -1,
-    lineHeight: 48,
-  },
-  dayCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  dayCircleCompleted: {
-    backgroundColor: '#43E6D0',
-  },
-  dayCircleCurrent: {
-    backgroundColor: 'rgba(102, 92, 255, 0.2)',
-    borderWidth: 2,
-    borderColor: '#665CFF',
-  },
-  dayCircleMuted: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  dayText: {
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'System',
-  },
-  dayTextCompleted: {
-    color: '#43E6D0',
-  },
-  dayTextCurrent: {
-    color: '#665CFF',
-  },
-  dayTextMuted: {
-    color: '#696678',
-  },
-  quickAction: {
+  metricCard: {
     width: '47%',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'col',
   },
-  quickActionTitle: {
-    color: '#F7F5FF',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginTop: 12,
+  metricHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  quickActionSubtitle: {
-    color: '#AAA7BA',
+  metricTitle: {
+    color: '#918ea1',
     fontSize: 10,
     fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+  },
+  metricValue: {
+    color: '#ffffff',
+    fontSize: 28,
+    fontWeight: '900',
+    fontStyle: 'italic',
+  },
+  metricSub: {
+    color: '#918ea1',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
     marginTop: 4,
-  },
-  iconWrapperViolet: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(102, 92, 255, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconWrapperOrange: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 138, 76, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconWrapperCyan: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(67, 230, 208, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconWrapperNeutral: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
   }
 });

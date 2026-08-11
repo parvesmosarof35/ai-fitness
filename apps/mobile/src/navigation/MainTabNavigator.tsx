@@ -21,8 +21,8 @@ export function MainTabNavigator() {
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Workouts" component={WorkoutNavigator} />
       <Tab.Screen name="Meals" component={MealScreen} />
+      <Tab.Screen name="Workouts" component={WorkoutNavigator} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

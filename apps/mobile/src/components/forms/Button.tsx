@@ -185,10 +185,7 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
   },
   primaryShadow: {
-    shadowColor: '#43E6D0',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
+    boxShadow: '0px 8px 12px rgba(67, 230, 208, 0.25)',
     elevation: 6,
   }
 });

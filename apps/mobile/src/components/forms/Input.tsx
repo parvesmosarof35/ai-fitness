@@ -31,7 +31,10 @@ export function Input({ name, control, rules, defaultValue, label, iconName, isP
   return (
     <View className="mb-5">
       <Text className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.2em] mb-2 ml-4">{label}</Text>
-      <View className={`flex-row items-center bg-surface px-5 py-4 rounded-full border ${fieldState.error ? 'border-red-500' : 'border-white/5 focus:border-primary/50'}`}>
+      <View className={`flex-row items-center bg-[#1b1b24] px-5 py-4 rounded-full border ${fieldState.error ? 'border-red-500' : 'border-white/5 focus:border-primary/50'}`}>
+        {IconComponent && (
+          <IconComponent color="#a1a1aa" size={20} className="mr-3" />
+        )}
         <TextInput
           className="flex-1 text-white text-base font-medium"
           value={field.value}
@@ -41,13 +44,11 @@ export function Input({ name, control, rules, defaultValue, label, iconName, isP
           secureTextEntry={isSecureText}
           {...inputProps}
         />
-        {isPassword ? (
+        {isPassword && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="ml-3">
             {showPassword ? <EyeOff color="#a1a1aa" size={20} /> : <Eye color="#a1a1aa" size={20} />}
           </TouchableOpacity>
-        ) : IconComponent ? (
-          <IconComponent color="#a1a1aa" size={20} className="ml-3" />
-        ) : null}
+        )}
       </View>
       {fieldState.error && (
         <Text className="text-red-500 text-xs mt-2 ml-4">{fieldState.error.message}</Text>

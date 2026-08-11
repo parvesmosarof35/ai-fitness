@@ -6,6 +6,7 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = loginSchema.extend({
+  fullName: z.string().min(2, 'Name must be at least 2 characters'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -13,6 +14,7 @@ export const registerSchema = loginSchema.extend({
 });
 
 export const onboardingSchema = z.object({
+  displayName: z.string().min(2, 'Display name must be at least 2 characters'),
   age: z.coerce.number().min(13, 'Must be at least 13').max(120, 'Invalid age'),
   language: z.enum(['en', 'bn']),
   unitSystem: z.enum(['metric', 'imperial']),
@@ -26,13 +28,12 @@ export const onboardingSchema = z.object({
   weightKg: z.coerce.number().optional(),
   weightLbs: z.coerce.number().optional(),
   
-  goals: z.string().min(1, 'Please select a goal'),
-  activityLevel: z.string().min(1, 'Please select an activity level'),
-  dailyTimeMinutes: z.coerce.number().min(5, 'Minimum 5 minutes'),
+  goals: z.enum(['lose_weight', 'build_muscle', 'stay_fit', 'gain_strength', 'improve_endurance', 'improve_flexibility']),
+  workoutEnvironment: z.enum(['gym', 'home', 'outdoor']),
+  workoutDaysPerWeek: z.coerce.number().min(2).max(7),
+  
   dietaryPreferences: z.string().optional(),
-  healthDisclaimerAccepted: z.literal(true, {
-    message: 'You must accept the health disclaimer'
-  }),
+  healthDisclaimerAccepted: z.boolean().default(true),
 }).superRefine((data, ctx) => {
   if (data.unitSystem === 'metric') {
     if (!data.heightCm || data.heightCm <= 0) {
