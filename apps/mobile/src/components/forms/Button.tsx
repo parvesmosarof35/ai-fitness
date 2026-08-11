@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   base: {
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
+    backgroundColor: 'transparent',
   },
   fullWidth: {
     width: '100%',
