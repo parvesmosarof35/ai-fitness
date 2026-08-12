@@ -17,7 +17,8 @@ export const onboardingSchema = z.object({
   displayName: z.string().min(2, 'Display name must be at least 2 characters'),
   age: z.coerce.number().min(13, 'Must be at least 13').max(120, 'Invalid age'),
   language: z.enum(['en', 'bn']),
-  unitSystem: z.enum(['metric', 'imperial']),
+  heightUnit: z.enum(['cm', 'ft']).default('ft'),
+  weightUnit: z.enum(['kg', 'lbs']).default('kg'),
   
   // Height fields
   heightCm: z.coerce.number().optional(),
@@ -35,19 +36,12 @@ export const onboardingSchema = z.object({
   dietaryPreferences: z.string().optional(),
   healthDisclaimerAccepted: z.boolean().default(true),
 }).superRefine((data, ctx) => {
-  if (data.unitSystem === 'metric') {
+  if (data.heightUnit === 'cm') {
     if (!data.heightCm || data.heightCm <= 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Height is required',
         path: ['heightCm'],
-      });
-    }
-    if (!data.weightKg || data.weightKg <= 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Weight is required',
-        path: ['weightKg'],
       });
     }
   } else {
@@ -65,6 +59,17 @@ export const onboardingSchema = z.object({
         path: ['heightIn'],
       });
     }
+  }
+
+  if (data.weightUnit === 'kg') {
+    if (!data.weightKg || data.weightKg <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Weight is required',
+        path: ['weightKg'],
+      });
+    }
+  } else {
     if (!data.weightLbs || data.weightLbs <= 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

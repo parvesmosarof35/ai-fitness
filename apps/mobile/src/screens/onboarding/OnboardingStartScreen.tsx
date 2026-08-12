@@ -4,10 +4,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { onboardingSchema, OnboardingPayload } from '../../schemas/profile';
 import { Input } from '../../components/forms/Input';
+import { AgeWheelPicker } from '../../components/forms/AgeWheelPicker';
+import { VerticalWheelPicker } from '../../components/forms/VerticalWheelPicker';
 import { useAuthStore } from '../../store/authStore';
 import { ftInToCm, lbsToKg } from '../../features/onboarding/utils';
 import { localStore, StorageKeys } from '../../services/storage/localStore';
-import { ArrowLeft, Sparkles, User, Dumbbell, Activity, Zap, Timer, Brain, ArrowRight, Home, TreePine, CheckCircle2, Loader2, Camera } from 'lucide-react-native';
+import { ArrowLeft, Sparkles, User, Dumbbell, Activity, Zap, Timer, Brain, ArrowRight, Home, TreePine, CheckCircle2, Loader2, Camera, ImagePlus, Ruler } from 'lucide-react-native';
 import { BrandGradient } from '../../components/ui/BrandGradient';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, withSequence, withSpring } from 'react-native-reanimated';
 
@@ -27,7 +29,8 @@ export default function OnboardingStartScreen() {
       displayName: '',
       age: undefined,
       language: 'en',
-      unitSystem: 'metric',
+      heightUnit: 'ft',
+      weightUnit: 'kg',
       goals: 'build_muscle',
       workoutEnvironment: 'gym',
       workoutDaysPerWeek: 4,
@@ -36,7 +39,8 @@ export default function OnboardingStartScreen() {
     mode: 'onTouched',
   });
 
-  const unitSystem = watch('unitSystem');
+  const heightUnit = watch('heightUnit');
+  const weightUnit = watch('weightUnit');
   const selectedGoal = watch('goals');
   const workoutEnvironment = watch('workoutEnvironment');
   const workoutDays = watch('workoutDaysPerWeek');
@@ -45,8 +49,10 @@ export default function OnboardingStartScreen() {
     let finalHeightCm = data.heightCm;
     let finalWeightKg = data.weightKg;
 
-    if (data.unitSystem === 'imperial') {
+    if (data.heightUnit === 'ft') {
       finalHeightCm = ftInToCm(data.heightFt || 0, data.heightIn || 0);
+    }
+    if (data.weightUnit === 'lbs') {
       finalWeightKg = lbsToKg(data.weightLbs || 0);
     }
 
@@ -55,7 +61,8 @@ export default function OnboardingStartScreen() {
         displayName: data.displayName,
         age: Number(data.age),
         language: data.language,
-        unitSystem: data.unitSystem,
+        heightUnit: data.heightUnit,
+        weightUnit: data.weightUnit,
         heightCm: finalHeightCm,
         weightKg: finalWeightKg,
         primaryGoal: data.goals,
@@ -80,9 +87,10 @@ export default function OnboardingStartScreen() {
     let fieldsToValidate: any[] = [];
     if (step === 1) fieldsToValidate = ['displayName', 'age'];
     if (step === 2) {
-      fieldsToValidate = unitSystem === 'metric' 
-        ? ['heightCm', 'weightKg'] 
-        : ['heightFt', 'heightIn', 'weightLbs'];
+      if (heightUnit === 'cm') fieldsToValidate.push('heightCm');
+      else fieldsToValidate.push('heightFt', 'heightIn');
+      if (weightUnit === 'kg') fieldsToValidate.push('weightKg');
+      else fieldsToValidate.push('weightLbs');
     }
     if (step === 3) fieldsToValidate = ['goals'];
     if (step === 4) fieldsToValidate = ['workoutEnvironment', 'workoutDaysPerWeek'];
@@ -207,18 +215,40 @@ export default function OnboardingStartScreen() {
                 <Text style={{ fontSize: 48, fontWeight: '900', letterSpacing: -1.76, lineHeight: 52, color: '#ffb68c' }}>START</Text>
               </View>
 
-              <View className="items-center mb-8 relative">
-                <TouchableOpacity activeOpacity={0.8} style={{ width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: '#6c5cff', backgroundColor: '#201f28', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  <User color="#918ea1" size={40} />
-                  <View style={{ position: 'absolute', bottom: 0, right: 0, width: 32, height: 32, borderRadius: 16, backgroundColor: '#6c5cff', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#13121c' }}>
-                    <Camera color="#ffffff" size={16} />
+              <View className="items-center mb-8">
+                <TouchableOpacity activeOpacity={0.8} style={{ alignItems: 'center' }}>
+                  <View style={{ position: 'relative', marginBottom: 16 }}>
+                    <View style={{ width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: '#6c5cff', backgroundColor: '#201f28', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <User color="#918ea1" size={40} />
+                    </View>
+                    <View style={{ position: 'absolute', bottom: -4, right: -4, width: 36, height: 36, borderRadius: 18, backgroundColor: '#6c5cff', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#13121c' }}>
+                      <ImagePlus color="#ffffff" size={18} />
+                    </View>
                   </View>
+                  <Text style={{ color: '#c8c4d8', fontSize: 10, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase' }}>UPLOAD PHOTO</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 24, padding: 24 }}>
                 <Input name="displayName" control={control} label="Display Name" placeholder="e.g. John Doe" autoCapitalize="words" />
-                <Input name="age" control={control} label="Age" placeholder="e.g. 25" keyboardType="numeric" />
+                
+                <View style={{ marginTop: 16 }}>
+                  <Controller
+                    control={control}
+                    name="age"
+                    render={({ field: { onChange, value } }) => (
+                      <AgeWheelPicker
+                        value={value as number}
+                        onChange={onChange}
+                      />
+                    )}
+                  />
+                  {errors.age && (
+                    <Text style={{ color: '#ffb4ab', fontSize: 12, marginTop: 4, marginLeft: 12 }}>
+                      {errors.age.message}
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
           )}
@@ -232,36 +262,66 @@ export default function OnboardingStartScreen() {
               </View>
 
               <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 24, padding: 24 }}>
-                <View className="mb-6">
-                  <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 12 }}>Measurement System</Text>
-                  <View className="flex-row gap-3">
-                    <TouchableOpacity onPress={() => setValue('unitSystem', 'metric')} style={{ flex: 1, paddingVertical: 12, borderRadius: 9999, borderWidth: 1, borderColor: unitSystem === 'metric' ? '#44eac3' : 'rgba(255,255,255,0.1)', backgroundColor: unitSystem === 'metric' ? 'rgba(68,234,195,0.1)' : 'transparent', alignItems: 'center' }}>
-                      <Text style={{ color: unitSystem === 'metric' ? '#44eac3' : '#c8c4d8', fontSize: 12, fontWeight: '700' }}>Metric (cm/kg)</Text>
+                
+                <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, marginBottom: 16, alignItems: 'center' }}>
+                  <View style={{ position: 'absolute', top: 16, left: 16, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Ruler color="#918ea1" size={14} />
+                    <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase' }}>HEIGHT</Text>
+                  </View>
+                  <View style={{ position: 'absolute', top: 12, right: 12, flexDirection: 'row', backgroundColor: '#2a2933', borderRadius: 9999, padding: 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }}>
+                    <TouchableOpacity onPress={() => setValue('heightUnit', 'cm')} style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, backgroundColor: heightUnit === 'cm' ? 'rgba(68,234,195,0.2)' : 'transparent' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: heightUnit === 'cm' ? '#44eac3' : '#918ea1' }}>CM</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setValue('unitSystem', 'imperial')} style={{ flex: 1, paddingVertical: 12, borderRadius: 9999, borderWidth: 1, borderColor: unitSystem === 'imperial' ? '#44eac3' : 'rgba(255,255,255,0.1)', backgroundColor: unitSystem === 'imperial' ? 'rgba(68,234,195,0.1)' : 'transparent', alignItems: 'center' }}>
-                      <Text style={{ color: unitSystem === 'imperial' ? '#44eac3' : '#c8c4d8', fontSize: 12, fontWeight: '700' }}>Imperial (ft/lbs)</Text>
+                    <TouchableOpacity onPress={() => setValue('heightUnit', 'ft')} style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, backgroundColor: heightUnit === 'ft' ? 'rgba(68,234,195,0.2)' : 'transparent' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: heightUnit === 'ft' ? '#44eac3' : '#918ea1' }}>FT/IN</Text>
                     </TouchableOpacity>
                   </View>
-                </View>
-
-                {unitSystem === 'metric' ? (
-                  <>
-                    <Input name="heightCm" control={control} label="Height (cm)" keyboardType="numeric" placeholder="e.g. 175" />
-                    <Input name="weightKg" control={control} label="Weight (kg)" keyboardType="numeric" placeholder="e.g. 70" />
-                  </>
-                ) : (
-                  <>
-                    <View className="flex-row gap-4">
-                      <View className="flex-1">
-                        <Input name="heightFt" control={control} label="Height (ft)" keyboardType="numeric" placeholder="e.g. 5" />
+                  <View style={{ height: 48 }} />
+                  {heightUnit === 'cm' ? (
+                    <Controller control={control} name="heightCm" render={({ field: { onChange, value } }) => (
+                      <VerticalWheelPicker value={value || 170} onChange={onChange} min={100} max={250} unit="CM" />
+                    )} />
+                  ) : (
+                    <View style={{ flexDirection: 'row', width: '100%' }}>
+                      <View style={{ flex: 1 }}>
+                        <Controller control={control} name="heightFt" render={({ field: { onChange, value } }) => (
+                          <VerticalWheelPicker value={value || 5} onChange={onChange} min={3} max={8} unit="FT" />
+                        )} />
                       </View>
-                      <View className="flex-1">
-                        <Input name="heightIn" control={control} label="Height (in)" keyboardType="numeric" placeholder="e.g. 9" />
+                      <View style={{ flex: 1 }}>
+                        <Controller control={control} name="heightIn" render={({ field: { onChange, value } }) => (
+                          <VerticalWheelPicker value={value || 8} onChange={onChange} min={0} max={11} unit="IN" />
+                        )} />
                       </View>
                     </View>
-                    <Input name="weightLbs" control={control} label="Weight (lbs)" keyboardType="numeric" placeholder="e.g. 150" />
-                  </>
-                )}
+                  )}
+                </View>
+
+                <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, alignItems: 'center' }}>
+                  <View style={{ position: 'absolute', top: 16, left: 16, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Activity color="#918ea1" size={14} />
+                    <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase' }}>WEIGHT</Text>
+                  </View>
+                  <View style={{ position: 'absolute', top: 12, right: 12, flexDirection: 'row', backgroundColor: '#2a2933', borderRadius: 9999, padding: 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }}>
+                    <TouchableOpacity onPress={() => setValue('weightUnit', 'kg')} style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, backgroundColor: weightUnit === 'kg' ? 'rgba(68,234,195,0.2)' : 'transparent' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: weightUnit === 'kg' ? '#44eac3' : '#918ea1' }}>KG</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setValue('weightUnit', 'lbs')} style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, backgroundColor: weightUnit === 'lbs' ? 'rgba(68,234,195,0.2)' : 'transparent' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: weightUnit === 'lbs' ? '#44eac3' : '#918ea1' }}>LBS</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ height: 48 }} />
+                  {weightUnit === 'kg' ? (
+                    <Controller control={control} name="weightKg" render={({ field: { onChange, value } }) => (
+                      <VerticalWheelPicker value={value || 70} onChange={onChange} min={30} max={200} unit="KG" />
+                    )} />
+                  ) : (
+                    <Controller control={control} name="weightLbs" render={({ field: { onChange, value } }) => (
+                      <VerticalWheelPicker value={value || 150} onChange={onChange} min={60} max={400} unit="LBS" />
+                    )} />
+                  )}
+                </View>
+
               </View>
             </View>
           )}
