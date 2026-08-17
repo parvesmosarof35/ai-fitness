@@ -4,6 +4,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WorkoutStackParamList } from '../../navigation/types';
 import { useCameraPermissions } from '../../features/camera/useCameraPermissions';
 import { mockProcessFrame } from '../../features/camera/poseProcessor';
+import { StateView } from '../../components/ui/StateView';
+import { GlassCard } from '../../components/ui/GlassCard';
 const Camera = (props: any) => null;
 const useCameraDevice = (dir: string) => null;
 
@@ -23,49 +25,58 @@ export default function CameraTrackerScreen({ route, navigation }: Props) {
 
   if (!hasPermission) {
     return (
-      <View className="flex-1 bg-zinc-900 items-center justify-center">
-        <Text className="text-white">Requesting camera permission...</Text>
-      </View>
+      <StateView
+        type="permission"
+        title="Camera Access Needed"
+        description="Please grant camera permission to use AI form tracking."
+        actionLabel="Go Back"
+        onAction={() => navigation.goBack()}
+      />
     );
   }
 
   if (device == null) {
     return (
-      <View className="flex-1 bg-zinc-900 items-center justify-center">
-        <Text className="text-white">No camera device found.</Text>
-      </View>
+      <StateView
+        type="error"
+        title="Camera Unavailable"
+        description="No active camera device was detected on your hardware."
+        actionLabel="Go Back"
+        onAction={() => navigation.goBack()}
+      />
     );
   }
 
   return (
-    <View className="flex-1 bg-black">
+    <View style={{ flex: 1, backgroundColor: '#080A10' }}>
       <Camera
         style={StyleSheet.absoluteFill}
         device={device}
         isActive={true}
       />
 
-      <View className="absolute top-16 left-6 right-6">
-        <View className="bg-zinc-900/80 p-4 rounded-xl flex-row justify-between items-center">
+      <View style={{ position: 'absolute', top: 60, left: 24, right: 24 }}>
+        <GlassCard contentStyle={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 }}>
           <View>
-            <Text className="text-zinc-400 font-bold text-xs">TRACKING</Text>
-            <Text className="text-white font-bold text-xl">{exerciseName}</Text>
+            <Text style={{ color: '#6F7687', fontWeight: '800', fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' }}>AI POSE TRACKER</Text>
+            <Text style={{ color: '#F5F7FC', fontWeight: '900', fontSize: 20 }}>{exerciseName}</Text>
           </View>
           <TouchableOpacity 
-            className="bg-emerald-500 px-4 py-2 rounded-lg"
+            style={{ backgroundColor: '#FF6B78', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 }}
             onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
           >
-            <Text className="text-zinc-900 font-bold">End</Text>
+            <Text style={{ color: '#F5F7FC', fontWeight: '800', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.5 }}>End</Text>
           </TouchableOpacity>
-        </View>
+        </GlassCard>
 
-        <View className="bg-red-500/80 mt-4 p-4 rounded-xl border border-red-500">
-          <Text className="text-white font-bold text-center">Lower your hips!</Text>
+        <View style={{ backgroundColor: 'rgba(255, 107, 120, 0.15)', marginTop: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255, 107, 120, 0.3)' }}>
+          <Text style={{ color: '#FF6B78', fontWeight: '800', textAlign: 'center', fontSize: 13, letterSpacing: 0.5 }}>Lower your hips for optimal depth!</Text>
         </View>
       </View>
 
-      <View className="absolute inset-0 pointer-events-none items-center justify-center">
-        <View className="w-48 h-64 border-2 border-emerald-400 border-dashed rounded-3xl" />
+      <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, pointerEvents: 'none', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: 220, height: 320, borderWidth: 2, borderColor: '#42E8CF', borderStyle: 'dashed', borderRadius: 32 }} />
       </View>
     </View>
   );

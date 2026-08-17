@@ -11,6 +11,9 @@ import { loginSchema, LoginPayload } from '../../schemas/profile';
 import { useAuthStore } from '../../store/authStore';
 import { Input } from '../../components/forms/Input';
 import { BrandGradient } from '../../components/ui/BrandGradient';
+import { ForgeBackground } from '../../components/ui/ForgeBackground';
+import { ForgeHeader } from '../../components/ui/ForgeHeader';
+import { GlassCard } from '../../components/ui/GlassCard';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -37,52 +40,41 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   return (
-    <View className="flex-1 bg-[#13121c]">
-      {/* Background Decor */}
-      <View style={[StyleSheet.absoluteFill, { pointerEvents: 'none' as any }]}>
-        <View style={{ position: 'absolute', top: '-10%', left: '-10%', width: 500, height: 500, borderRadius: 250, backgroundColor: 'rgba(108,92,255,0.15)', transform: [{ scale: 1.5 }] }} />
-        <View style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: 600, height: 600, borderRadius: 300, backgroundColor: 'rgba(68,234,195,0.1)', transform: [{ scale: 1.5 }] }} />
-      </View>
+    <ForgeBackground>
+      <ForgeHeader onBack={() => navigation.goBack()} />
 
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        className="flex-1"
+        style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }} bounces={false} keyboardShouldPersistTaps="handled">
-          {/* Header */}
-          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50, paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 40) + 20 : 60, paddingHorizontal: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} pointerEvents="box-none">
-            <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
-              <ArrowLeft color="#918ea1" size={20} />
-            </TouchableOpacity>
-            <Text style={{ color: '#c5c0ff', fontSize: 28, fontWeight: '900', letterSpacing: -0.8 }} className="uppercase text-center">FORGE AI</Text>
-            <View style={{ width: 40 }} />
-          </View>
-
-          <View className="flex-1 justify-center px-6 pt-[120px] w-full max-w-md mx-auto">
+        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, paddingHorizontal: 24, justifyContent: 'center' }} bounces={false} keyboardShouldPersistTaps="handled">
+          <View style={{ width: '100%', maxWidth: 420, alignSelf: 'center' }}>
+            
             {/* Title Section */}
-            <View className="mb-8 relative items-center">
-              <View className="absolute -top-4 -left-2 opacity-50">
-                <Sparkles color="#6c5cff" size={24} />
+            <View style={{ marginBottom: 32, alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <Sparkles color="#7C6CFF" size={20} />
+                <Text style={{ fontSize: 12, fontWeight: '800', letterSpacing: 2, color: '#7C6CFF', textTransform: 'uppercase' }}>FORGE AI AUTH</Text>
               </View>
-              <Text style={{ fontSize: 48, fontWeight: '900', letterSpacing: -1.76, lineHeight: 52, color: '#6c5cff' }}>WELCOME</Text>
-              <Text style={{ fontSize: 48, fontWeight: '900', letterSpacing: -1.76, lineHeight: 52, color: '#44eac3' }}>BACK</Text>
+              <Text style={{ fontSize: 32, fontWeight: '900', color: '#F5F7FC', textAlign: 'center', letterSpacing: -0.5 }}>Welcome Back</Text>
+              <Text style={{ fontSize: 14, fontWeight: '500', color: '#A7ADBC', textAlign: 'center', marginTop: 6 }}>Sign in to continue your training journey</Text>
             </View>
 
             {/* Glass Form Card */}
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 24, padding: 24 }} className="shadow-2xl">
-              <View className="mb-4">
+            <GlassCard variant="hero" style={{ padding: 0 }} contentStyle={{ padding: 24 }}>
+              <View style={{ marginBottom: 16 }}>
                 <Input
                   name="email"
                   control={control}
                   label="Email Address"
-                  placeholder="runner@kinetic.ai"
+                  placeholder="athlete@forgeai.app"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   iconName="mail"
                 />
               </View>
 
-              <View className="mb-2 relative">
+              <View style={{ marginBottom: 8 }}>
                 <Input
                   name="password"
                   control={control}
@@ -92,16 +84,16 @@ export default function LoginScreen({ navigation }: Props) {
                 />
               </View>
 
-              <View className="items-end mb-6">
+              <View style={{ alignItems: 'flex-end', marginBottom: 24 }}>
                 <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword' as any)}>
-                  <Text style={{ color: '#b45f24', fontSize: 12, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' }}>Forgot Password?</Text>
+                  <Text style={{ color: '#42E8CF', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 }}>Forgot Password?</Text>
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity onPress={handleSubmit(onSubmit)} activeOpacity={0.8} style={{ shadowColor: '#6c5cff', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 8, marginBottom: 24 }}>
-                <BrandGradient colors={['#6c5cff', '#44eac3'] as any} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 9999 }}>
+              <TouchableOpacity onPress={handleSubmit(onSubmit)} activeOpacity={0.8} style={{ shadowColor: '#7C6CFF', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 8, marginBottom: 24 }}>
+                <BrandGradient colors={['#7C6CFF', '#42E8CF'] as any} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 16 }}>
                   <View style={{ paddingVertical: 16, alignItems: 'center' }}>
-                    <Text style={{ color: '#13121c', fontSize: 14, fontWeight: '800', letterSpacing: 1.4, textTransform: 'uppercase' }}>
+                    <Text style={{ color: '#080A10', fontSize: 14, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' }}>
                       {isSubmitting ? 'Verifying...' : 'Login'}
                     </Text>
                   </View>
@@ -109,34 +101,34 @@ export default function LoginScreen({ navigation }: Props) {
               </TouchableOpacity>
 
               {/* Divider */}
-              <View className="flex-row items-center mb-6 opacity-60">
-                <View className="flex-1 h-[1px] bg-white/20" />
-                <Text style={{ color: '#918ea1', fontSize: 12, fontWeight: '700', marginHorizontal: 16 }}>OR</Text>
-                <View className="flex-1 h-[1px] bg-white/20" />
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20, opacity: 0.6 }}>
+                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.15)' }} />
+                <Text style={{ color: '#6F7687', fontSize: 11, fontWeight: '700', marginHorizontal: 16, letterSpacing: 1 }}>OR</Text>
+                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.15)' }} />
               </View>
 
               {/* Social Logins */}
-              <TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 9999, paddingVertical: 14, marginBottom: 12 }}>
-                <Globe color="#e5e0ee" size={20} style={{ marginRight: 12 }} />
-                <Text style={{ color: '#e5e0ee', fontSize: 14, fontWeight: '800' }}>Continue with Google</Text>
+              <TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.04)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', borderRadius: 16, paddingVertical: 14, marginBottom: 12 }}>
+                <Globe color="#F5F7FC" size={18} style={{ marginRight: 10 }} />
+                <Text style={{ color: '#F5F7FC', fontSize: 14, fontWeight: '700' }}>Continue with Google</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 9999, paddingVertical: 14 }}>
-                <Download color="#e5e0ee" size={20} style={{ marginRight: 12 }} />
-                <Text style={{ color: '#e5e0ee', fontSize: 14, fontWeight: '800' }}>Continue with Apple</Text>
+              <TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.04)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', borderRadius: 16, paddingVertical: 14 }}>
+                <Download color="#F5F7FC" size={18} style={{ marginRight: 10 }} />
+                <Text style={{ color: '#F5F7FC', fontSize: 14, fontWeight: '700' }}>Continue with Apple</Text>
               </TouchableOpacity>
-            </View>
+            </GlassCard>
 
             {/* Footer */}
-            <View className="flex-row justify-center mt-8">
-              <Text style={{ color: '#c8c4d8', fontSize: 16 }}>Don't have an account? </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 32 }}>
+              <Text style={{ color: '#A7ADBC', fontSize: 15 }}>Don't have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Register' as any)}>
-                <Text style={{ color: '#44eac3', fontSize: 16, fontWeight: '700' }}>Create Account</Text>
+                <Text style={{ color: '#42E8CF', fontSize: 15, fontWeight: '700' }}>Create Account</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </ForgeBackground>
   );
 }

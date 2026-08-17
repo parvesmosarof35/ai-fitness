@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WorkoutStackParamList } from '../../navigation/types';
 import { useActiveWorkoutStore } from '../../store/activeWorkoutStore';
 import { Button } from '../../components/forms/Button';
-import { Check, Clock, Dumbbell, Flame } from 'lucide-react-native';
+import { Check, Clock, Dumbbell, Trophy } from 'lucide-react-native';
+import { ForgeBackground } from '../../components/ui/ForgeBackground';
+import { GlassCard } from '../../components/ui/GlassCard';
 
 type Props = NativeStackScreenProps<WorkoutStackParamList, 'WorkoutComplete'>;
 
@@ -29,47 +31,53 @@ export default function WorkoutCompleteScreen({ navigation }: Props) {
   });
 
   return (
-    <View className="flex-1 bg-zinc-950 pt-24 px-6 items-center">
-      <View className="w-24 h-24 bg-brand-cyan/20 rounded-full items-center justify-center border-4 border-brand-cyan mb-8 shadow-[0_0_40px_rgba(34,211,238,0.3)]">
-        <Check color="#22d3ee" size={48} strokeWidth={3} />
-      </View>
-      
-      <Text className="text-4xl font-black text-white mb-2 text-center tracking-tight">Workout Complete</Text>
-      <Text className="text-zinc-400 mb-2 text-center font-medium">
-        {plan?.title || "Your Workout"}
-      </Text>
-      
-      {state === 'save_failed' && (
-         <Text className="text-brand-orange font-bold text-xs mb-8">Could not save workout on this device.</Text>
-      )}
-      {state === 'completed' && (
-         <Text className="text-brand-cyan font-bold text-xs mb-8">Workout saved on this device.</Text>
-      )}
-
-      <View className="flex-row flex-wrap gap-4 mb-12 w-full justify-center">
-        <View className="bg-surface-highlight p-5 rounded-3xl flex-1 min-w-[40%] items-center border border-white/5 shadow-lg">
-          <Clock color="#a1a1aa" size={24} className="mb-3" />
-          <Text className="text-white font-black text-3xl">{durationMinutes}</Text>
-          <Text className="text-zinc-500 text-[10px] uppercase tracking-wider mt-1 font-bold">Minutes</Text>
-        </View>
-        <View className="bg-surface-highlight p-5 rounded-3xl flex-1 min-w-[40%] items-center border border-white/5 shadow-lg">
-          <Check color="#a1a1aa" size={24} className="mb-3" />
-          <Text className="text-white font-black text-3xl">{totalSets}</Text>
-          <Text className="text-zinc-500 text-[10px] uppercase tracking-wider mt-1 font-bold">Sets</Text>
+    <ForgeBackground>
+      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 80, alignItems: 'center' }}>
+        
+        {/* Success Icon */}
+        <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(66, 232, 207, 0.15)', borderWidth: 2, borderColor: '#42E8CF', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+          <Check color="#42E8CF" size={40} strokeWidth={3} />
         </View>
         
-        {totalVolume > 0 && (
-          <View className="bg-surface-highlight p-5 rounded-3xl flex-1 min-w-[40%] items-center border border-white/5 shadow-lg">
-            <Dumbbell color="#a1a1aa" size={24} className="mb-3" />
-            <Text className="text-white font-black text-3xl">{totalVolume}</Text>
-            <Text className="text-zinc-500 text-[10px] uppercase tracking-wider mt-1 font-bold">Volume (kg)</Text>
-          </View>
+        <Text style={{ fontSize: 32, fontWeight: '900', color: '#F5F7FC', textAlign: 'center', letterSpacing: -0.5, marginBottom: 6 }}>Workout Complete!</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#A7ADBC', textAlign: 'center', marginBottom: 16 }}>
+          {plan?.title || "Your Workout"}
+        </Text>
+        
+        {state === 'save_failed' && (
+           <Text style={{ color: '#FF6B78', fontWeight: '800', fontSize: 12, marginBottom: 24 }}>Could not save workout on this device.</Text>
         )}
-      </View>
+        {state === 'completed' && (
+           <Text style={{ color: '#42E8CF', fontWeight: '800', fontSize: 12, marginBottom: 24 }}>Workout saved to your training history.</Text>
+        )}
 
-      <View className="w-full absolute bottom-8 px-6">
-        <Button label="Done" onPress={handleDone} variant="primary" size="lg" />
+        {/* Stats Grid */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, width: '100%', marginBottom: 32 }}>
+          <GlassCard style={{ flex: 1, minWidth: '40%' }} contentStyle={{ alignItems: 'center', padding: 20 }}>
+            <Clock color="#7C6CFF" size={22} style={{ marginBottom: 8 }} />
+            <Text style={{ fontSize: 28, fontWeight: '900', color: '#F5F7FC' }}>{durationMinutes}</Text>
+            <Text style={{ fontSize: 10, fontWeight: '800', color: '#6F7687', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>MINUTES</Text>
+          </GlassCard>
+
+          <GlassCard style={{ flex: 1, minWidth: '40%' }} contentStyle={{ alignItems: 'center', padding: 20 }}>
+            <Trophy color="#42E8CF" size={22} style={{ marginBottom: 8 }} />
+            <Text style={{ fontSize: 28, fontWeight: '900', color: '#F5F7FC' }}>{totalSets}</Text>
+            <Text style={{ fontSize: 10, fontWeight: '800', color: '#6F7687', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>SETS DONE</Text>
+          </GlassCard>
+          
+          {totalVolume > 0 && (
+            <GlassCard style={{ width: '100%' }} contentStyle={{ alignItems: 'center', padding: 20 }}>
+              <Dumbbell color="#FF9B6A" size={22} style={{ marginBottom: 8 }} />
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#F5F7FC' }}>{totalVolume} kg</Text>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: '#6F7687', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>TOTAL VOLUME</Text>
+            </GlassCard>
+          )}
+        </View>
+
+        <View style={{ width: '100%', position: 'absolute', bottom: 40, left: 24, right: 24 }}>
+          <Button label="DONE" onPress={handleDone} variant="primary" size="lg" />
+        </View>
       </View>
-    </View>
+    </ForgeBackground>
   );
 }

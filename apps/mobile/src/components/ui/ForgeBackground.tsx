@@ -57,12 +57,12 @@ export const ForgeBackground: React.FC<ForgeBackgroundProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0B13',
+    backgroundColor: '#080A10',
     position: 'relative',
   },
   baseBg: {
     ...(StyleSheet.absoluteFill as any),
-    backgroundColor: '#0B0B13',
+    backgroundColor: '#080A10',
   },
   topGlowContainer: {
     position: 'absolute',

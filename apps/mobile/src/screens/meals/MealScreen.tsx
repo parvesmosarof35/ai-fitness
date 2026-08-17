@@ -3,6 +3,9 @@ import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, Platform, 
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react-native';
 import Animated, { FadeInDown, withRepeat, withSequence, withTiming, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
+import { ForgeBackground } from '../../components/ui/ForgeBackground';
+import { ForgeHeader } from '../../components/ui/ForgeHeader';
+import { GlassCard } from '../../components/ui/GlassCard';
 
 type Props = { navigation: any };
 
@@ -23,62 +26,45 @@ export default function MealScreen({ navigation }: Props) {
   const progress = consumedKcal / targetKcal;
 
   return (
-    <View className="flex-1 bg-[#0F1015]">
-      {/* Background Orbs */}
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <View style={{ position: 'absolute', top: '-10%', left: '-20%', width: '70%', aspectRatio: 1, borderRadius: 9999, backgroundColor: 'rgba(108,92,255,0.1)', filter: 'blur(100px)' }} />
-        <View style={{ position: 'absolute', bottom: '10%', right: '-10%', width: '60%', aspectRatio: 1, borderRadius: 9999, backgroundColor: 'rgba(68,234,195,0.1)', filter: 'blur(100px)' }} />
-      </View>
+    <ForgeBackground>
+      <ForgeHeader onBack={navigation.canGoBack() ? () => navigation.goBack() : undefined} />
 
-      {/* Top App Bar */}
-      <View style={{ paddingTop: Platform.OS === 'android' ? 50 : 60, paddingHorizontal: 24, paddingBottom: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(15,16,21,0.5)', zIndex: 50 }}>
-        {navigation.canGoBack() ? (
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.goBack()}>
-            <ArrowLeft color="#6c5cff" size={24} />
-          </TouchableOpacity>
-        ) : <View style={{ width: 24 }} />}
-        
-        <Text style={{ color: '#e5e0ee', fontSize: 16, fontWeight: '900', letterSpacing: 2, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>AURA</Text>
-        
-        <View style={{ width: 24 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 24, paddingTop: 16 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 130, paddingHorizontal: 24, paddingTop: 16 }} showsVerticalScrollIndicator={false}>
         
         {/* Page Header */}
-        <Animated.View entering={FadeInDown.duration(400).delay(100)} className="mb-10">
-          <Text style={{ fontSize: 32, fontWeight: '900', color: '#e5e0ee', textTransform: 'uppercase', letterSpacing: -1 }}>DAILY FUEL</Text>
+        <Animated.View entering={FadeInDown.duration(400).delay(100)} style={{ marginBottom: 24 }}>
+          <Text style={{ fontSize: 32, fontWeight: '900', color: '#F5F7FC', textTransform: 'uppercase', letterSpacing: -0.5 }}>DAILY FUEL</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#44eac3', shadowColor: '#44eac3', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 8, elevation: 4 }} />
-            <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>LIVE TRACKING ACTIVE</Text>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#42E8CF', shadowColor: '#42E8CF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 8, elevation: 4 }} />
+            <Text style={{ color: '#A7ADBC', fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' }}>NUTRITION TRACKING ACTIVE</Text>
           </View>
         </Animated.View>
 
         {/* Today's Macros Card */}
-        <Animated.View entering={FadeInDown.duration(400).delay(200)} className="mb-10">
-          <View style={{ backgroundColor: 'rgba(32,34,42,0.4)', borderRadius: 32, padding: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }}>
+        <Animated.View entering={FadeInDown.duration(400).delay(200)} style={{ marginBottom: 24 }}>
+          <GlassCard variant="hero" style={{ padding: 0 }} contentStyle={{ padding: 24 }}>
             
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-              <Text style={{ color: '#e5e0ee', fontSize: 16, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>TODAY'S MACROS</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <Text style={{ color: '#F5F7FC', fontSize: 16, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>TODAY'S MACROS</Text>
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={{ color: '#44eac3', fontSize: 10, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>DETAILS</Text>
-                <ArrowRight color="#44eac3" size={14} />
+                <Text style={{ color: '#42E8CF', fontSize: 11, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' }}>DETAILS</Text>
+                <ArrowRight color="#42E8CF" size={14} />
               </TouchableOpacity>
             </View>
 
             <View style={{ alignItems: 'center', width: '100%' }}>
               {/* Circular Tracker */}
-              <View style={{ width: size, height: size, marginBottom: 32, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ width: size, height: size, marginBottom: 24, justifyContent: 'center', alignItems: 'center' }}>
                 <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
                   <Circle
                     cx={center} cy={center} r={radius}
-                    stroke="#2C2E36"
+                    stroke="rgba(255, 255, 255, 0.08)"
                     strokeWidth={strokeWidth}
                     fill="none"
                   />
                   <Circle
                     cx={center} cy={center} r={radius}
-                    stroke="#44eac3"
+                    stroke="#42E8CF"
                     strokeWidth={strokeWidth}
                     fill="none"
                     strokeDasharray={circumference}
@@ -87,31 +73,30 @@ export default function MealScreen({ navigation }: Props) {
                   />
                 </Svg>
                 <View style={{ position: 'absolute', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 36, fontWeight: '900', color: '#e5e0ee', letterSpacing: -1 }}>1.8k</Text>
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#918ea1', letterSpacing: 2, textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>KCAL</Text>
+                  <Text style={{ fontSize: 32, fontWeight: '900', color: '#F5F7FC', letterSpacing: -0.5 }}>1.8k</Text>
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: '#6F7687', letterSpacing: 1, textTransform: 'uppercase' }}>KCAL</Text>
                 </View>
               </View>
 
               {/* Macro Bars */}
-              <View style={{ width: '100%', gap: 24 }}>
-                <MacroBar label="PROTEIN" current={145} total={180} color="#6c5cff" percentage={80} />
-                <MacroBar label="CARBS" current={210} total={250} color="#44eac3" percentage={84} />
-                <MacroBar label="FAT" current={52} total={70} color="#ffb68c" percentage={74} />
+              <View style={{ width: '100%', gap: 16 }}>
+                <MacroBar label="PROTEIN" current={145} total={180} color="#7C6CFF" percentage={80} />
+                <MacroBar label="CARBS" current={210} total={250} color="#42E8CF" percentage={84} />
+                <MacroBar label="FAT" current={52} total={70} color="#FF9B6A" percentage={74} />
               </View>
             </View>
 
-          </View>
+          </GlassCard>
         </Animated.View>
 
         {/* Today's Log */}
-        <Animated.View entering={FadeInDown.duration(400).delay(300)} className="mb-4">
-          <Text style={{ color: '#e5e0ee', fontSize: 16, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>TODAY'S LOG</Text>
+        <Animated.View entering={FadeInDown.duration(400).delay(300)} style={{ marginBottom: 16 }}>
+          <Text style={{ color: '#F5F7FC', fontSize: 16, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16 }}>TODAY'S LOG</Text>
           
           <MealItem 
             title="Pre-Workout Fuel"
             time="08:00 AM"
             kcal="650"
-            imgUri={MEAL_1_IMG}
             macros={{ p: 45, c: 60, f: 20 }}
           />
 
@@ -119,22 +104,21 @@ export default function MealScreen({ navigation }: Props) {
             title="Recovery Lunch"
             time="13:30 PM"
             kcal="820"
-            imgUri={MEAL_2_IMG}
             macros={{ p: 65, c: 80, f: 25 }}
           />
 
           {/* Add Meal Button */}
           <TouchableOpacity 
             activeOpacity={0.7}
-            style={{ width: '100%', paddingVertical: 16, borderRadius: 9999, borderWidth: 2, borderStyle: 'dashed', borderColor: 'rgba(108,92,255,0.3)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16 }}
+            style={{ width: '100%', paddingVertical: 16, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(124, 108, 255, 0.4)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, backgroundColor: 'rgba(124, 108, 255, 0.05)' }}
           >
-            <Plus color="#6c5cff" size={20} strokeWidth={3} />
-            <Text style={{ color: '#6c5cff', fontSize: 14, fontWeight: '800', letterSpacing: 2, textTransform: 'uppercase' }}>LOG MEAL</Text>
+            <Plus color="#7C6CFF" size={18} strokeWidth={2.5} />
+            <Text style={{ color: '#7C6CFF', fontSize: 13, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' }}>LOG MEAL</Text>
           </TouchableOpacity>
         </Animated.View>
 
       </ScrollView>
-    </View>
+    </ForgeBackground>
   );
 }
 
@@ -143,49 +127,46 @@ export default function MealScreen({ navigation }: Props) {
 function MacroBar({ label, current, total, color, percentage }: { label: string, current: number, total: number, color: string, percentage: number }) {
   return (
     <View style={{ width: '100%' }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
-        <Text style={{ color: '#e5e0ee', fontSize: 10, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>{label}</Text>
-        <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', letterSpacing: 1, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
-          <Text style={{ color: '#e5e0ee' }}>{current}g</Text> / {total}g
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
+        <Text style={{ color: '#F5F7FC', fontSize: 11, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' }}>{label}</Text>
+        <Text style={{ color: '#A7ADBC', fontSize: 11, fontWeight: '700' }}>
+          <Text style={{ color: '#F5F7FC' }}>{current}g</Text> / {total}g
         </Text>
       </View>
-      <View style={{ height: 10, width: '100%', backgroundColor: '#2C2E36', borderRadius: 5, overflow: 'hidden' }}>
-        <View style={{ height: '100%', width: `${percentage}%`, backgroundColor: color, borderRadius: 5 }} />
+      <View style={{ height: 8, width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: 4, overflow: 'hidden' }}>
+        <View style={{ height: '100%', width: `${percentage}%`, backgroundColor: color, borderRadius: 4 }} />
       </View>
     </View>
   );
 }
 
-function MealItem({ title, time, kcal, imgUri, macros }: { title: string, time: string, kcal: string, imgUri: string, macros: { p: number, c: number, f: number } }) {
+function MealItem({ title, time, kcal, macros }: { title: string, time: string, kcal: string, macros: { p: number, c: number, f: number } }) {
   return (
-    <TouchableOpacity 
-      activeOpacity={0.8}
-      style={{ backgroundColor: 'rgba(32,34,42,0.4)', borderRadius: 32, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }}
+    <GlassCard 
+      style={{ marginBottom: 12 }}
+      contentStyle={{ padding: 16 }}
     >
-      <View style={{ width: 64, height: 64, borderRadius: 32, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(255,255,255,0.05)' }}>
-        <Image source={{ uri: imgUri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
-      </View>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <Text style={{ color: '#e5e0ee', fontSize: 16, fontWeight: '700' }}>{title}</Text>
-          <Text style={{ color: '#44eac3', fontSize: 10, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>{kcal} KCAL</Text>
+          <Text style={{ color: '#F5F7FC', fontSize: 16, fontWeight: '800' }}>{title}</Text>
+          <Text style={{ color: '#42E8CF', fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' }}>{kcal} KCAL</Text>
         </View>
-        <Text style={{ color: '#918ea1', fontSize: 10, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace', marginBottom: 12 }}>{time}</Text>
+        <Text style={{ color: '#6F7687', fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 12 }}>{time}</Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <MacroPill label="P" value={`${macros.p}g`} color="#6c5cff" />
-          <MacroPill label="C" value={`${macros.c}g`} color="#44eac3" />
-          <MacroPill label="F" value={`${macros.f}g`} color="#ffb68c" />
+          <MacroPill label="P" value={`${macros.p}g`} color="#7C6CFF" />
+          <MacroPill label="C" value={`${macros.c}g`} color="#42E8CF" />
+          <MacroPill label="F" value={`${macros.f}g`} color="#FF9B6A" />
         </View>
       </View>
-    </TouchableOpacity>
+    </GlassCard>
   );
 }
 
 function MacroPill({ label, value, color }: { label: string, value: string, color: string }) {
   return (
-    <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999, backgroundColor: `${color}1A`, borderWidth: 1, borderColor: `${color}33`, flexDirection: 'row', gap: 4 }}>
-      <Text style={{ color, fontSize: 9, fontWeight: '700', textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>{label}</Text>
-      <Text style={{ color, fontSize: 9, fontWeight: '700', textTransform: 'uppercase', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>{value}</Text>
+    <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, backgroundColor: `${color}1F`, borderWidth: 1, borderColor: `${color}40`, flexDirection: 'row', gap: 4 }}>
+      <Text style={{ color, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{label}</Text>
+      <Text style={{ color, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{value}</Text>
     </View>
   );
 }
