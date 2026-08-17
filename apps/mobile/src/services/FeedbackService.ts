@@ -1,5 +1,4 @@
 import * as Haptics from 'expo-haptics';
-import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type FeedbackSettings = {
@@ -20,7 +19,7 @@ const DEFAULT_SETTINGS: FeedbackSettings = {
 
 class FeedbackService {
   private settings: FeedbackSettings = DEFAULT_SETTINGS;
-  private soundCache: Record<string, Audio.Sound> = {};
+  private soundCache: Record<string, any> = {};
 
   async initialize() {
     try {
