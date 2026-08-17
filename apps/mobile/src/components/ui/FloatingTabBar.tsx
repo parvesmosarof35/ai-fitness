@@ -86,10 +86,11 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
               <Text style={{ 
                 color, 
                 fontSize: 10, 
-                fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace', // fallback for JetBrains Mono
+                fontFamily: 'System',
                 textTransform: 'uppercase', 
                 marginTop: 4,
-                fontWeight: '700' 
+                fontWeight: '700',
+                letterSpacing: 0.5,
               }}>
                 {label}
               </Text>

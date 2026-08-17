@@ -69,7 +69,7 @@ export default function ProfileScreen() {
 
         {/* Profile Summary */}
         <Animated.View entering={FadeInDown.duration(400).delay(200)} style={styles.section}>
-          <GlassCard style={styles.summaryCard}>
+          <GlassCard style={styles.summaryCard} contentStyle={{ padding: 0, flexDirection: 'row', width: '100%', alignItems: 'center' }}>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryValue}>ADD</Text>
               <Text style={styles.summaryLabel}>WEIGHT</Text>
@@ -90,7 +90,7 @@ export default function ProfileScreen() {
         {/* Settings Groups */}
         <Animated.View entering={FadeInDown.duration(400).delay(300)} style={styles.section}>
           <Text style={styles.groupLabel}>PERSONAL</Text>
-          <GlassCard style={styles.groupCard}>
+          <GlassCard style={styles.groupCard} contentStyle={{ padding: 0 }}>
             <MenuOption icon={User} title="Edit Profile" subtitle="Name, email and goals" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
             <MenuOption icon={Activity} title="Body Measurements" subtitle="Track your progress" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
             <MenuOption icon={Utensils} title="Dietary Preferences" subtitle="Vegan, keto, allergies" isLast onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
@@ -99,7 +99,7 @@ export default function ProfileScreen() {
 
         <Animated.View entering={FadeInDown.duration(400).delay(350)} style={styles.section}>
           <Text style={styles.groupLabel}>EXPERIENCE</Text>
-          <GlassCard style={styles.groupCard}>
+          <GlassCard style={styles.groupCard} contentStyle={{ padding: 0 }}>
             <MenuOption icon={Bell} title="Notifications" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
             <MenuOption icon={Smartphone} title="Sounds & Haptics" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
             <MenuOption icon={Settings} title="Units & Language" isLast onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
 
         <Animated.View entering={FadeInDown.duration(400).delay(400)} style={styles.section}>
           <Text style={styles.groupLabel}>ACCOUNT</Text>
-          <GlassCard style={styles.groupCard}>
+          <GlassCard style={styles.groupCard} contentStyle={{ padding: 0 }}>
             <MenuOption icon={Lock} title="Privacy & Security" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
             <MenuOption icon={HelpCircle} title="Help & Support" onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
             <MenuOption icon={Shield} title="About Forge AI" isLast onPress={() => Alert.alert('Coming Soon', 'This feature is coming soon!')} />
@@ -123,7 +123,7 @@ export default function ProfileScreen() {
                <Text style={{ color: '#AAA7BA', marginTop: 12, fontFamily: 'System', fontWeight: '700' }}>Signing out...</Text>
              </GlassCard>
           ) : (
-            <GlassCard variant="danger" style={styles.groupCard}>
+            <GlassCard variant="danger" style={styles.groupCard} contentStyle={{ padding: 0 }}>
               <MenuOption icon={LogOut} title="Sign Out" destructive isLast onPress={() => setShowLogoutModal(true)} />
             </GlassCard>
           )}

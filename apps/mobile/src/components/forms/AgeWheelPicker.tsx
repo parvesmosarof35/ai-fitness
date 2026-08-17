@@ -68,7 +68,14 @@ export function AgeWheelPicker({ value, onChange }: AgeWheelPickerProps) {
           showsHorizontalScrollIndicator={false}
           snapToInterval={ITEM_WIDTH}
           decelerationRate="fast"
+          getItemLayout={(_, index) => ({
+            length: ITEM_WIDTH,
+            offset: ITEM_WIDTH * index,
+            index,
+          })}
           onScroll={handleScroll}
+          onMomentumScrollEnd={handleScroll}
+          onScrollEndDrag={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{ paddingHorizontal: scrollerWidth > 0 ? (scrollerWidth - ITEM_WIDTH) / 2 : 100 }}
           renderItem={({ item, index }) => {

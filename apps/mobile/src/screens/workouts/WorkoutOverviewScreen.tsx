@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 24,
-    paddingBottom: 40, // Account for safe area or spacing
-    paddingTop: 40,
+    paddingBottom: 90,
+    paddingTop: 16,
   }
 });

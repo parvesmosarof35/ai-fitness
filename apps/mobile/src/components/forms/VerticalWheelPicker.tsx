@@ -41,13 +41,13 @@ export function VerticalWheelPicker({ value, onChange, min, max, unit }: Vertica
 
   return (
     <View style={{ height: ITEM_HEIGHT * 3, overflow: 'hidden', position: 'relative', width: '100%' }}>
-      {/* Top and Bottom Fades */}
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: ITEM_HEIGHT, zIndex: 10, backgroundColor: 'rgba(19,18,28,0.7)', pointerEvents: 'none' }} />
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: ITEM_HEIGHT, zIndex: 10, backgroundColor: 'rgba(19,18,28,0.7)', pointerEvents: 'none' }} />
+      {/* Top and Bottom Fades - pointerEvents="none" as a JSX prop so touches pass through */}
+      <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: ITEM_HEIGHT, zIndex: 10, backgroundColor: 'rgba(19,18,28,0.7)' }} />
+      <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: ITEM_HEIGHT, zIndex: 10, backgroundColor: 'rgba(19,18,28,0.7)' }} />
       
-      {/* Center Highlight Line */}
-      <View style={{ position: 'absolute', top: ITEM_HEIGHT, left: 0, right: 0, height: 1, backgroundColor: 'rgba(68,234,195,0.3)', shadowColor: '#44eac3', shadowOffset: {width: 0, height: 0}, shadowOpacity: 0.5, shadowRadius: 8, zIndex: 5 }} />
-      <View style={{ position: 'absolute', bottom: ITEM_HEIGHT, left: 0, right: 0, height: 1, backgroundColor: 'rgba(68,234,195,0.3)', shadowColor: '#44eac3', shadowOffset: {width: 0, height: 0}, shadowOpacity: 0.5, shadowRadius: 8, zIndex: 5 }} />
+      {/* Center Highlight Lines */}
+      <View pointerEvents="none" style={{ position: 'absolute', top: ITEM_HEIGHT, left: 0, right: 0, height: 1, backgroundColor: 'rgba(68,234,195,0.3)', shadowColor: '#44eac3', shadowOffset: {width: 0, height: 0}, shadowOpacity: 0.5, shadowRadius: 8, zIndex: 5 }} />
+      <View pointerEvents="none" style={{ position: 'absolute', bottom: ITEM_HEIGHT, left: 0, right: 0, height: 1, backgroundColor: 'rgba(68,234,195,0.3)', shadowColor: '#44eac3', shadowOffset: {width: 0, height: 0}, shadowOpacity: 0.5, shadowRadius: 8, zIndex: 5 }} />
 
       <FlatList
         ref={flatListRef}
@@ -56,7 +56,14 @@ export function VerticalWheelPicker({ value, onChange, min, max, unit }: Vertica
         showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
         decelerationRate="fast"
+        getItemLayout={(_, index) => ({
+          length: ITEM_HEIGHT,
+          offset: ITEM_HEIGHT * index,
+          index,
+        })}
         onScroll={handleScroll}
+        onMomentumScrollEnd={handleScroll}
+        onScrollEndDrag={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingVertical: ITEM_HEIGHT }}
         renderItem={({ item, index }) => {
@@ -71,7 +78,7 @@ export function VerticalWheelPicker({ value, onChange, min, max, unit }: Vertica
                 {item}
               </Text>
               {unit && isActive && (
-                <Text style={{ color: '#44eac3', fontSize: 14, fontWeight: '700', marginLeft: 4, marginTop: 10, fontFamily: 'monospace' }}>{unit}</Text>
+                <Text style={{ color: '#44eac3', fontSize: 14, fontWeight: '700', marginLeft: 4, marginTop: 10, fontFamily: 'System' }}>{unit}</Text>
               )}
             </View>
           );

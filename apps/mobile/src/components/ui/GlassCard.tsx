@@ -11,6 +11,41 @@ interface GlassCardProps extends ViewProps {
   children: React.ReactNode;
 }
 
+const LAYOUT_STYLE_KEYS = new Set([
+  'flexDirection',
+  'alignItems',
+  'justifyContent',
+  'gap',
+  'rowGap',
+  'columnGap',
+  'flexWrap',
+  'padding',
+  'paddingHorizontal',
+  'paddingVertical',
+  'paddingTop',
+  'paddingBottom',
+  'paddingLeft',
+  'paddingRight',
+]);
+
+const splitStyles = (styleObj: any) => {
+  const flat = StyleSheet.flatten(styleObj);
+  if (!flat) return { container: {}, content: {} };
+
+  const container: Record<string, any> = {};
+  const content: Record<string, any> = {};
+
+  Object.keys(flat).forEach((key) => {
+    if (LAYOUT_STYLE_KEYS.has(key)) {
+      content[key] = (flat as any)[key];
+    } else {
+      container[key] = (flat as any)[key];
+    }
+  });
+
+  return { container, content };
+};
+
 export const GlassCard: React.FC<GlassCardProps> = ({
   variant = 'default',
   style,
@@ -18,18 +53,20 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   children,
   ...props
 }) => {
+  const { container: splitContainerStyle, content: splitContentStyle } = splitStyles(style);
+
   const getContainerStyle = (): StyleProp<ViewStyle> => {
     switch (variant) {
       case 'hero':
-        return [styles.container, styles.heroContainer, style];
+        return [styles.container, styles.heroContainer, splitContainerStyle];
       case 'elevated':
-        return [styles.container, styles.elevatedContainer, style];
+        return [styles.container, styles.elevatedContainer, splitContainerStyle];
       case 'selected':
-        return [styles.container, styles.selectedContainer, style];
+        return [styles.container, styles.selectedContainer, splitContainerStyle];
       case 'danger':
-        return [styles.container, styles.dangerContainer, style];
+        return [styles.container, styles.dangerContainer, splitContainerStyle];
       default:
-        return [styles.container, style];
+        return [styles.container, splitContainerStyle];
     }
   };
 
@@ -58,7 +95,6 @@ export const GlassCard: React.FC<GlassCardProps> = ({
 
   return (
     <View style={getContainerStyle()} {...props}>
-      {/* 1px glowing/transparent border via padding/gradient trick */}
       <LinearGradient
         colors={getBorderGradient()}
         start={{ x: 0, y: 0 }}
@@ -71,10 +107,8 @@ export const GlassCard: React.FC<GlassCardProps> = ({
           end={{ x: 0, y: 1 }}
           style={styles.innerWrapper}
         >
-          {variant === 'selected' && (
-             <View style={styles.selectedGlow} />
-          )}
-          <View style={[styles.content, contentStyle]}>
+          {variant === 'selected' && <View style={styles.selectedGlow} />}
+          <View style={[styles.content, splitContentStyle, contentStyle]}>
             {children}
           </View>
         </LinearGradient>
@@ -86,12 +120,13 @@ export const GlassCard: React.FC<GlassCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: 24,
-    overflow: 'hidden', // Shadow applies to parent if needed, but inner is hidden
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 15,
     elevation: 5,
+    width: '100%',
   },
   heroContainer: {
     borderRadius: 28,
@@ -112,13 +147,15 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
   },
   borderWrapper: {
-    padding: 1, // 1px border
+    padding: 1,
     borderRadius: 24,
+    width: '100%',
   },
   innerWrapper: {
-    borderRadius: 23, // 1px less than outer
+    borderRadius: 23,
     overflow: 'hidden',
     position: 'relative',
+    width: '100%',
   },
   selectedGlow: {
     position: 'absolute',
@@ -130,5 +167,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-  }
+    width: '100%',
+  },
 });
