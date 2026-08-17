@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, ScrollView, Dimensions, ImageBackground, TouchableOpacity, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { View, Text, ScrollView, Dimensions, ImageBackground, TouchableOpacity, SafeAreaView, Platform, StatusBar, StyleSheet } from 'react-native';
 import { useAuthStore } from '../../store/authStore';
 import { ArrowRight, Zap, ChevronRight } from 'lucide-react-native';
 import { BrandGradient } from '../../components/ui/BrandGradient';
@@ -137,29 +137,28 @@ export function IntroScreen() {
     }
 
     return (
-      <View key={slide.id} style={{ width, height }} className="bg-zinc-900">
-        <ImageBackground source={slide.image} className="absolute inset-0" imageStyle={{ opacity: 0.6 }} />
+      <View key={slide.id} style={{ width, height, backgroundColor: '#080A10' }}>
+        <ImageBackground source={slide.image} style={StyleSheet.absoluteFill} imageStyle={{ opacity: 0.4, resizeMode: 'cover' }} />
         <View
-          style={{ backgroundColor: 'rgba(17, 24, 39, 0.7)' }}
-          className="absolute inset-0"
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(8, 10, 16, 0.75)' }]}
         />
         
-        <View className="flex-1 justify-end px-8 pb-32 z-10">
-          <View className="mb-4">
-            <Text style={{ color: slide.titleColor1 }} className="text-5xl font-black uppercase leading-none tracking-tight">
+        <View style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: 32, paddingBottom: 220, zIndex: 10 }}>
+          <View style={{ marginBottom: 12 }}>
+            <Text style={{ color: slide.titleColor1, fontSize: 44, fontWeight: '900', textTransform: 'uppercase', lineHeight: 48, letterSpacing: -0.5 }}>
               {slide.titleLine1}
             </Text>
-            <Text style={{ color: slide.titleColor2 }} className="text-5xl font-black uppercase leading-none tracking-tight">
+            <Text style={{ color: slide.titleColor2, fontSize: 44, fontWeight: '900', textTransform: 'uppercase', lineHeight: 48, letterSpacing: -0.5 }}>
               {slide.titleLine2}
             </Text>
           </View>
 
-          <Text className="text-zinc-300 text-sm leading-relaxed mb-8 pr-4">
+          <Text style={{ color: '#A7ADBC', fontSize: 15, lineHeight: 22, fontWeight: '500' }}>
             {slide.description?.split(slide.highlightText || '').map((part, i, arr) => (
               <React.Fragment key={i}>
                 {part}
                 {i < arr.length - 1 && (
-                  <Text style={{ color: slide.highlightColor }} className="font-semibold">
+                  <Text style={{ color: slide.highlightColor || '#42E8CF', fontWeight: '700' }}>
                     {slide.highlightText}
                   </Text>
                 )}
@@ -172,7 +171,7 @@ export function IntroScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#18181b]">
+    <View style={{ flex: 1, backgroundColor: '#080A10' }}>
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -188,10 +187,10 @@ export function IntroScreen() {
       {/* Header: Logo & Skip */}
       {activeIndex > 0 && (
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50, paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 40) + 20 : 60, paddingHorizontal: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} pointerEvents="box-none">
-          <Text style={{ color: '#E3E1E9', fontSize: 28, fontWeight: '900', letterSpacing: -1.2 }} className="uppercase drop-shadow-md">FORGE AI</Text>
+          <Text style={{ color: '#F5F7FC', fontSize: 24, fontWeight: '900', letterSpacing: -0.5 }}>FORGE AI</Text>
           {activeIndex < SLIDES.length - 1 && (
             <TouchableOpacity onPress={() => setHasSeenIntro()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Text style={{ color: '#C8C4D8', letterSpacing: 2.4, fontSize: 12, fontWeight: 'bold' }} className="uppercase">SKIP</Text>
+              <Text style={{ color: '#42E8CF', letterSpacing: 1.5, fontSize: 12, fontWeight: '800' }}>SKIP</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -199,36 +198,37 @@ export function IntroScreen() {
 
       {/* Footer: Dots & CTA */}
       {activeIndex > 0 && (
-        <View style={{ position: 'absolute', bottom: 48, left: 0, right: 0, zIndex: 50, paddingHorizontal: 32 }} pointerEvents="box-none">
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 32, alignItems: 'center', height: 6 }}>
+        <View style={{ position: 'absolute', bottom: 40, left: 0, right: 0, zIndex: 50, paddingHorizontal: 32 }} pointerEvents="box-none">
+          {/* Pagination Indicators */}
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20, alignItems: 'center', justifyContent: 'flex-start', height: 6 }}>
             {SLIDES.slice(1).map((_, i) => {
               const currentDataIndex = i + 1;
               const isActive = currentDataIndex === activeIndex;
               if (isActive) {
                 return (
-                  <View key={i} style={{ height: 6, width: 48, borderRadius: 9999, overflow: 'hidden' }}>
-                    <BrandGradient colors={['#6C5CFF', '#5FFFD7'] as any} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ flex: 1 }} />
+                  <View key={i} style={{ height: 6, width: 36, borderRadius: 3, overflow: 'hidden' }}>
+                    <BrandGradient colors={['#7C6CFF', '#42E8CF'] as any} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ flex: 1 }} />
                   </View>
-                )
+                );
               }
               return (
-                <View key={i} style={{ height: 6, width: 24, borderRadius: 9999, backgroundColor: '#34343A', opacity: 0.5 }} />
-              )
+                <View key={i} style={{ height: 6, width: 16, borderRadius: 3, backgroundColor: 'rgba(255, 255, 255, 0.15)' }} />
+              );
             })}
           </View>
 
-          <TouchableOpacity onPress={handleNext} activeOpacity={0.8} style={{ shadowColor: '#6C5CFF', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.4, shadowRadius: 30, elevation: 10 }}>
+          <TouchableOpacity onPress={handleNext} activeOpacity={0.8} style={{ shadowColor: '#7C6CFF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 20, elevation: 8 }}>
             <BrandGradient
-              colors={['#6C5CFF', '#5FFFD7'] as any}
+              colors={['#7C6CFF', '#42E8CF'] as any}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={{ borderRadius: 9999 }}
+              style={{ borderRadius: 16 }}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 20, paddingHorizontal: 32 }}>
-                <Text style={{ letterSpacing: 3.6, color: '#ffffff', fontWeight: 'bold', fontSize: 16, marginRight: 8 }} className="uppercase">
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 18, paddingHorizontal: 32 }}>
+                <Text style={{ letterSpacing: 1.5, color: '#080A10', fontWeight: '800', fontSize: 15, marginRight: 8, textTransform: 'uppercase' }}>
                   {SLIDES[activeIndex].btnText}
                 </Text>
-                <ArrowRight color="#ffffff" size={20} strokeWidth={2.5} />
+                <ArrowRight color="#080A10" size={18} strokeWidth={2.5} />
               </View>
             </BrandGradient>
           </TouchableOpacity>
