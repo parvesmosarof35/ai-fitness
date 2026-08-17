@@ -35,7 +35,7 @@ const SLIDES: SlideData[] = [
     description: 'AI-powered plans that adapt to your progress in real-time.',
     highlightText: 'AI-powered',
     highlightColor: '#55ffcc',
-    image: require('../../../assets/intro/gym_1.png'),
+    image: require('../../../assets/intro/gym_1.jpg'),
     btnText: 'NEXT',
   },
   {
@@ -48,7 +48,7 @@ const SLIDES: SlideData[] = [
     description: 'Scan meals and track macros with instant AI recognition.',
     highlightText: 'instant AI recognition',
     highlightColor: '#5eead4',
-    image: require('../../../assets/intro/food.png'),
+    image: require('../../../assets/intro/food.jpg'),
     btnText: 'NEXT',
   },
   {
@@ -61,7 +61,7 @@ const SLIDES: SlideData[] = [
     description: 'Your 24/7 partner for motivation, form correction, and advice.',
     highlightText: '24/7 partner',
     highlightColor: '#00f2fe',
-    image: require('../../../assets/intro/gym_2.png'),
+    image: require('../../../assets/intro/gym_2.jpg'),
     btnText: 'NEXT',
   },
   {
@@ -72,7 +72,7 @@ const SLIDES: SlideData[] = [
     titleColor1: '#3b82f6', 
     titleColor2: '#fb923c', 
     description: 'Your AI Personal Trainer, Nutrition Coach and Workout Partner.',
-    image: require('../../../assets/intro/gym_1.png'), 
+    image: require('../../../assets/intro/gym_1.jpg'), 
     btnText: 'GET STARTED',
   }
 ];
